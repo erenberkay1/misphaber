@@ -1,0 +1,1200 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Yönetim Paneli — MISP Haber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #c8102e;
+    --brand-dark: #8a0a1f;
+    --ink: #16181d;
+    --ink-2: #3a3f47;
+    --muted: #6b727c;
+    --line: #e4e6ea;
+    --line-2: #f0f1f3;
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --ok: #0b7a3b;
+    --warn: #d35400;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Source Sans 3", sans-serif; background: var(--bg); color: var(--ink); font-size: 14.5px; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; }
+
+  /* === LOGIN === */
+  .login-screen {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(ellipse at top, rgba(200,16,46,.12), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(31,75,138,.08), transparent 60%),
+      #0e1014;
+    color: #fff;
+    padding: 20px;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #15181f;
+    border: 1px solid #232830;
+    padding: 40px 36px;
+    border-radius: 4px;
+  }
+  .login-logo {
+    font-family: "Playfair Display", serif;
+    font-weight: 900;
+    font-size: 36px;
+    letter-spacing: -.02em;
+    margin: 0 0 4px;
+  }
+  .login-logo .m { color: var(--brand); }
+  .login-sub {
+    color: #8a909a;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    margin: 0 0 28px;
+  }
+  .login-card h2 {
+    font-family: "Playfair Display", serif;
+    font-weight: 800;
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+  .login-card .hint {
+    color: #8a909a;
+    font-size: 13px;
+    margin: 0 0 24px;
+  }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: #8a909a;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .field input {
+    width: 100%;
+    height: 44px;
+    background: #0e1014;
+    border: 1px solid #2a2f38;
+    color: #fff;
+    padding: 0 14px;
+    font: inherit;
+    font-size: 15px;
+    border-radius: 3px;
+    outline: none;
+    transition: border .15s;
+  }
+  .field input:focus { border-color: var(--brand); }
+  .err {
+    background: rgba(200,16,46,.12);
+    color: #ff8a98;
+    border: 1px solid rgba(200,16,46,.25);
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 3px;
+    margin-bottom: 14px;
+  }
+  .btn-primary {
+    width: 100%; height: 46px;
+    background: var(--brand);
+    color: #fff; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .12em; font-size: 13px;
+    border: none; cursor: pointer;
+    border-radius: 3px;
+    transition: background .15s;
+  }
+  .btn-primary:hover { background: var(--brand-dark); }
+  .login-foot {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #232830;
+    font-size: 12px;
+    color: #6b727c;
+    font-family: "JetBrains Mono", monospace;
+    line-height: 1.6;
+  }
+  .login-foot b { color: #b9bfc9; }
+  .login-back { text-align: center; margin-top: 16px; }
+  .login-back a { color: #8a909a; font-size: 13px; }
+  .login-back a:hover { color: #fff; }
+
+  /* === APP LAYOUT === */
+  .app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+  aside.side {
+    background: #0e1014;
+    color: #c5c9d1;
+    display: flex; flex-direction: column;
+  }
+  .side-logo {
+    padding: 20px 22px;
+    border-bottom: 1px solid #1d2027;
+  }
+  .side-logo .name { font-family: "Playfair Display", serif; font-weight: 900; font-size: 24px; color: #fff; line-height: 1; }
+  .side-logo .name .m { color: var(--brand); }
+  .side-logo .label { font-size: 10.5px; letter-spacing: .2em; color: #8a909a; text-transform: uppercase; margin-top: 4px; }
+
+  .side-nav { padding: 14px 10px; flex: 1; }
+  .side-nav .group { font-size: 10px; text-transform: uppercase; letter-spacing: .18em; color: #6b727c; padding: 14px 12px 6px; }
+  .side-nav button {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    background: none; border: none; color: #c5c9d1;
+    padding: 10px 12px; border-radius: 4px;
+    font-size: 14px; cursor: pointer; font-weight: 500;
+  }
+  .side-nav button:hover { background: #1a1d24; color: #fff; }
+  .side-nav button.active { background: var(--brand); color: #fff; font-weight: 600; }
+  .side-nav button .ico { width: 18px; display: inline-flex; justify-content: center; }
+  .side-nav button .count {
+    margin-left: auto;
+    background: #232830; color: #c5c9d1;
+    font-size: 11px; padding: 2px 7px; border-radius: 10px;
+    font-family: "JetBrains Mono", monospace;
+  }
+  .side-nav button.active .count { background: rgba(0,0,0,.25); color: #fff; }
+
+  .side-foot {
+    padding: 14px 22px;
+    border-top: 1px solid #1d2027;
+    font-size: 12px;
+    color: #6b727c;
+  }
+  .side-foot a { color: #c5c9d1; }
+  .side-foot a:hover { color: #fff; }
+
+  main.content { padding: 0; min-width: 0; }
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 14px 28px;
+    display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 5;
+  }
+  .topbar h1 { font-family: "Playfair Display", serif; font-weight: 800; font-size: 22px; margin: 0; }
+  .topbar .crumb { color: var(--muted); font-size: 13px; margin-left: 8px; }
+  .topbar .actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+  .topbar .who {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 13px;
+  }
+  .topbar .who .avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--brand); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 13px;
+  }
+  .btn {
+    height: 36px; padding: 0 14px;
+    border-radius: 3px; border: 1px solid var(--line);
+    background: #fff; color: var(--ink);
+    font-weight: 600; font-size: 13px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { border-color: var(--ink); }
+  .btn.red { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .btn.red:hover { background: var(--brand-dark); border-color: var(--brand-dark); }
+  .btn.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .btn.ghost-red { color: var(--brand); border-color: var(--brand); }
+  .btn.ghost-red:hover { background: var(--brand); color: #fff; }
+  .btn.sm { height: 30px; padding: 0 10px; font-size: 12px; }
+
+  .body-area { padding: 28px; }
+
+  /* === DASHBOARD === */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat {
+    background: #fff; border: 1px solid var(--line); padding: 18px 20px; border-radius: 4px;
+  }
+  .stat .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); font-weight: 600; }
+  .stat .val { font-family: "Playfair Display", serif; font-weight: 900; font-size: 36px; line-height: 1; margin-top: 8px; }
+  .stat .delta { font-family: "JetBrains Mono", monospace; font-size: 12px; margin-top: 8px; }
+  .stat .delta.up { color: var(--ok); }
+  .stat .delta.down { color: var(--brand); }
+  .stat .ico {
+    float: right;
+    width: 38px; height: 38px;
+    background: var(--bg);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    border-radius: 4px;
+  }
+
+  .dash-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; }
+  .panel-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 4px;
+  }
+  .panel-card h3 {
+    margin: 0; padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    font-family: "Playfair Display", serif;
+    font-weight: 800; font-size: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-card h3 .sub { font-family: "Source Sans 3", sans-serif; font-weight: 500; color: var(--muted); font-size: 12px; }
+
+  .activity { padding: 6px 0; }
+  .activity li {
+    list-style: none;
+    display: grid; grid-template-columns: 32px 1fr auto; gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line-2);
+    align-items: center;
+  }
+  .activity li:last-child { border: none; }
+  .activity .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--brand); display: block; margin: 0 auto;
+  }
+  .activity .dot.ok { background: var(--ok); }
+  .activity .dot.info { background: #2a6fdb; }
+  .activity .txt { font-size: 13.5px; }
+  .activity .when { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--muted); }
+
+  .cat-bars { padding: 18px 20px; }
+  .cat-bar { margin-bottom: 12px; }
+  .cat-bar .row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+  .cat-bar .row .n { font-family: "JetBrains Mono", monospace; color: var(--muted); }
+  .cat-bar .track { height: 6px; background: var(--bg); border-radius: 999px; overflow: hidden; }
+  .cat-bar .fill { height: 100%; border-radius: 999px; }
+
+  /* === LIST === */
+  .toolbar {
+    display: flex; gap: 10px; margin-bottom: 16px;
+    background: #fff; padding: 12px; border: 1px solid var(--line); border-radius: 4px;
+    align-items: center;
+  }
+  .toolbar input[type=text], .toolbar select {
+    height: 36px; padding: 0 12px;
+    border: 1px solid var(--line); border-radius: 3px;
+    background: #fff; color: var(--ink); font: inherit; font-size: 13.5px;
+    outline: none;
+  }
+  .toolbar input[type=text]:focus, .toolbar select:focus { border-color: var(--ink); }
+  .toolbar input[type=text] { flex: 1; min-width: 200px; }
+  .toolbar .count { margin-left: auto; color: var(--muted); font-size: 13px; font-family: "JetBrains Mono", monospace; }
+
+  table.news-table {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    border-collapse: collapse;
+    overflow: hidden;
+  }
+  .news-table th {
+    background: var(--bg);
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--muted);
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    font-weight: 700;
+  }
+  .news-table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--line-2);
+    vertical-align: middle;
+    font-size: 13.5px;
+  }
+  .news-table tr:last-child td { border: none; }
+  .news-table tr:hover { background: #fafbfc; }
+  .news-table .thumb {
+    width: 64px; height: 44px; overflow: hidden;
+    background: #eee;
+    border-radius: 3px;
+  }
+  .news-table .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .news-table .title { font-weight: 600; font-size: 14px; max-width: 420px; }
+  .news-table .title .ex { display: block; color: var(--muted); font-weight: 400; font-size: 12.5px; margin-top: 2px; }
+  .pill-cat {
+    display: inline-block;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 8px; border-radius: 3px;
+    color: #fff;
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .pill-star {
+    background: #fff3cd; color: #8a6d00; border: 1px solid #ffe79e;
+    font-size: 11px; padding: 2px 6px; border-radius: 3px; font-weight: 700;
+  }
+  .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+  .empty {
+    text-align: center; padding: 50px; color: var(--muted);
+    background: #fff; border: 1px dashed var(--line); border-radius: 4px;
+  }
+  .empty h3 { font-family: "Playfair Display", serif; font-size: 22px; margin: 0 0 8px; color: var(--ink); }
+  .empty .btn { margin-top: 14px; }
+
+  /* === EDITOR === */
+  .editor-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
+  .ed-card { background: #fff; border: 1px solid var(--line); border-radius: 4px; }
+  .ed-card .ed-head {
+    padding: 14px 18px; border-bottom: 1px solid var(--line);
+    font-family: "Playfair Display", serif; font-weight: 800; font-size: 15px;
+  }
+  .ed-card .ed-body { padding: 18px; }
+  .form-field { margin-bottom: 16px; }
+  .form-field label {
+    display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .14em;
+    color: var(--muted); font-weight: 700; margin-bottom: 6px;
+  }
+  .form-field input[type=text],
+  .form-field input[type=url],
+  .form-field select,
+  .form-field textarea {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 3px;
+    background: #fff; color: var(--ink); font: inherit;
+    outline: none;
+  }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--ink); }
+  .cat-picker {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 4px;
+  }
+  .cat-chip {
+    background: #fff;
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: all .12s;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .cat-chip:hover { transform: translateY(-1px); }
+  .cat-chip.active { box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+
+  .form-field .title-input {
+    font-family: "Playfair Display", serif;
+    font-weight: 800; font-size: 22px;
+    line-height: 1.2;
+    border: none; padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+  }
+  .form-field .title-input:focus { border-bottom-color: var(--brand); }
+  .form-field textarea { resize: vertical; font-family: "Source Sans 3", sans-serif; font-size: 15px; line-height: 1.6; min-height: 220px; }
+  .form-field .summary-input { font-size: 16px; min-height: 80px; }
+  .form-field .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .form-field .char-count { float: right; font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--muted); }
+
+  .image-upload {
+    border: 2px dashed var(--line);
+    border-radius: 4px;
+    padding: 24px;
+    text-align: center;
+    background: var(--bg);
+    cursor: pointer;
+    transition: border .15s, background .15s;
+  }
+  .image-upload:hover, .image-upload.drag { border-color: var(--brand); background: #fff; }
+  .image-upload .ico { font-size: 32px; margin-bottom: 6px; color: var(--muted); }
+  .image-upload .lbl { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .image-upload .sub { font-size: 12px; color: var(--muted); }
+  .image-preview {
+    position: relative;
+    border-radius: 4px; overflow: hidden;
+    aspect-ratio: 16/9;
+    background: #eee;
+  }
+  .image-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .image-preview button {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(0,0,0,.7); color: #fff; border: none;
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+    font-size: 14px;
+  }
+
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-top: 1px solid var(--line-2);
+  }
+  .toggle-row:first-child { border-top: none; }
+  .toggle-row .l { font-weight: 600; font-size: 13.5px; }
+  .toggle-row .l .h { display: block; font-weight: 400; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .switch { position: relative; width: 40px; height: 22px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #ccc; border-radius: 999px; cursor: pointer; transition: .2s; }
+  .slider::before {
+    content: ""; position: absolute; left: 2px; top: 2px;
+    width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: .2s;
+  }
+  .switch input:checked + .slider { background: var(--brand); }
+  .switch input:checked + .slider::before { transform: translateX(18px); }
+
+  .preview-card { padding: 16px; border: 1px dashed var(--line); border-radius: 4px; background: var(--bg); }
+  .preview-card .tag {
+    display:inline-block; font-size:10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em;
+    margin-bottom: 8px;
+  }
+  .preview-card h4 { font-family: "Playfair Display", serif; font-weight: 800; font-size: 18px; line-height: 1.2; margin: 0 0 6px; }
+  .preview-card p { font-size: 13px; color: var(--ink-2); margin: 0; }
+  .preview-card .meta { font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: var(--muted); margin-top: 8px; }
+
+  .save-row { display: flex; gap: 10px; margin-top: 18px; }
+  .save-row .btn { height: 44px; padding: 0 18px; font-size: 14px; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: #0e1014; color: #fff;
+    padding: 12px 18px; border-radius: 4px;
+    font-size: 13.5px; font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    z-index: 100;
+    animation: slidein .25s ease;
+  }
+  .toast.ok { background: var(--ok); }
+  .toast.warn { background: var(--brand); }
+  @keyframes slidein { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* simple ph */
+  .ph {
+    background: linear-gradient(135deg, var(--c1,#c8102e), var(--c2,#8a0a1f));
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,.9);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px; text-transform: uppercase; letter-spacing: .1em;
+  }
+  .ph.cat-gundem    { --c1:#c8102e;--c2:#8a0a1f }
+  .ph.cat-politika  { --c1:#1f4b8a;--c2:#0e2a52 }
+  .ph.cat-dunya     { --c1:#2a6fdb;--c2:#1a4791 }
+  .ph.cat-ekonomi   { --c1:#0b7a3b;--c2:#044a23 }
+  .ph.cat-spor      { --c1:#d35400;--c2:#8a3700 }
+  .ph.cat-magazin   { --c1:#a33089;--c2:#6a1c58 }
+  .ph.cat-saglik    { --c1:#0d8c8c;--c2:#075959 }
+  .ph.cat-teknoloji { --c1:#5a3da6;--c2:#382562 }
+  .ph.cat-kultur    { --c1:#7a5c2e;--c2:#4a371b }
+
+  /* modal */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(14,16,20,.6);
+    display: grid; place-items: center; z-index: 50;
+  }
+  .modal {
+    background: #fff; border-radius: 6px;
+    width: 100%; max-width: 420px;
+    padding: 24px;
+  }
+  .modal h3 { font-family: "Playfair Display", serif; font-weight: 800; font-size: 20px; margin: 0 0 8px; }
+  .modal p { color: var(--muted); margin: 0 0 20px; font-size: 14px; }
+  .modal .acts { display: flex; gap: 10px; justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="data.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" data-presets="react">
+/* MISP Haber - Admin Paneli */
+const { useState, useEffect, useMemo, useRef } = React;
+
+const AUTH_KEY = "misp_haber_auth_v1";
+
+// --- Login --------------------------------------------------------
+function Login({ onLogin }) {
+  const [user, setUser] = useState("");
+  const [pass, setPass] = useState("");
+  const [err, setErr] = useState("");
+
+  function submit(e) {
+    e.preventDefault();
+    if (user.trim() === "admin" && pass === "123") {
+      sessionStorage.setItem(AUTH_KEY, "1");
+      onLogin();
+    } else {
+      setErr("Kullanıcı adı veya şifre hatalı.");
+    }
+  }
+
+  return (
+    <div className="login-screen">
+      <div className="login-card">
+        <div className="login-logo"><span className="m">M</span>ISP<span style={{color:"#c8102e"}}>.</span>Haber</div>
+        <div className="login-sub">İçerik Yönetimi</div>
+
+        <h2>Giriş</h2>
+        <p className="hint">Devam etmek için lütfen hesabınızla giriş yapın.</p>
+
+        <form onSubmit={submit} autoComplete="off">
+          {err && <div className="err">⚠ {err}</div>}
+          <div className="field">
+            <label>Kullanıcı Adı</label>
+            <input type="text" value={user} onChange={e=>setUser(e.target.value)} autoFocus />
+          </div>
+          <div className="field">
+            <label>Şifre</label>
+            <input type="password" value={pass} onChange={e=>setPass(e.target.value)} />
+          </div>
+          <button type="submit" className="btn-primary">Giriş Yap</button>
+        </form>
+
+        <div className="login-back">
+          <a href="index.html">← Anasayfaya dön</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Sidebar ------------------------------------------------------
+function Sidebar({ active, onNav, stats, onLogout }) {
+  const items = [
+    { id: "dashboard", label: "Panel",            ico: "▦" },
+    { id: "list",      label: "Tüm Haberler",     ico: "≡", count: stats.total },
+    { id: "new",       label: "Yeni Haber Ekle",  ico: "+" },
+  ];
+  const items2 = [
+    { id: "categories", label: "Kategoriler", ico: "◧", count: stats.categories },
+    { id: "settings",   label: "Ayarlar",     ico: "⚙" },
+  ];
+
+  return (
+    <aside className="side">
+      <div className="side-logo">
+        <div className="name"><span className="m">M</span>ISP<span style={{color:"#c8102e"}}>.</span>Haber</div>
+        <div className="label">Yönetim Paneli</div>
+      </div>
+      <div className="side-nav">
+        <div className="group">İçerik</div>
+        {items.map(it => (
+          <button key={it.id} className={active === it.id ? "active" : ""} onClick={() => onNav(it.id)}>
+            <span className="ico">{it.ico}</span>{it.label}
+            {typeof it.count === "number" && <span className="count">{it.count}</span>}
+          </button>
+        ))}
+        <div className="group">Site</div>
+        {items2.map(it => (
+          <button key={it.id} className={active === it.id ? "active" : ""} onClick={() => onNav(it.id)}>
+            <span className="ico">{it.ico}</span>{it.label}
+            {typeof it.count === "number" && <span className="count">{it.count}</span>}
+          </button>
+        ))}
+        <div className="group">Hızlı Erişim</div>
+        <button onClick={() => window.open("index.html", "_blank")}>
+          <span className="ico">↗</span>Siteyi Görüntüle
+        </button>
+      </div>
+      <div className="side-foot">
+        <a href="#" onClick={(e)=>{e.preventDefault();onLogout();}}>↩ Çıkış Yap</a>
+      </div>
+    </aside>
+  );
+}
+
+// --- Topbar -------------------------------------------------------
+function Topbar({ title, crumb, actions }) {
+  return (
+    <div className="topbar">
+      <h1>{title}</h1>
+      {crumb && <span className="crumb">/ {crumb}</span>}
+      <div className="actions">
+        {actions}
+        <a className="btn sm" href="index.html" target="_blank">↗ Siteyi Aç</a>
+        <div className="who">
+          <span className="avatar">A</span>
+          <span>admin</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Dashboard ----------------------------------------------------
+function Dashboard({ news, onNav }) {
+  const stats = useMemo(() => {
+    const total = news.length;
+    const featured = news.filter(n => n.featured).length;
+    const today = news.filter(n => Date.now() - n.published < 24*3600*1000).length;
+    const last7 = news.filter(n => Date.now() - n.published < 7*24*3600*1000).length;
+    return { total, featured, today, last7 };
+  }, [news]);
+
+  const catStats = useMemo(() => {
+    const max = Math.max(1, ...MISP.CATEGORIES.map(c => news.filter(n => n.category === c.id).length));
+    return MISP.CATEGORIES.map(c => {
+      const count = news.filter(n => n.category === c.id).length;
+      return { ...c, count, pct: Math.round((count / max) * 100) };
+    }).sort((a,b) => b.count - a.count);
+  }, [news]);
+
+  const recent = news.slice(0, 6);
+
+  return (
+    <>
+      <Topbar title="Yönetim Paneli" crumb="Genel Bakış"
+        actions={<button className="btn red" onClick={() => onNav("new")}>+ Yeni Haber</button>} />
+      <div className="body-area">
+        <div className="stats">
+          <div className="stat">
+            <span className="ico">≡</span>
+            <div className="lbl">Toplam Haber</div>
+            <div className="val">{stats.total}</div>
+            <div className="delta up">▲ Aktif yayında</div>
+          </div>
+          <div className="stat">
+            <span className="ico">★</span>
+            <div className="lbl">Manşet Haberler</div>
+            <div className="val">{stats.featured}</div>
+            <div className="delta up">Anasayfada öne çıkan</div>
+          </div>
+          <div className="stat">
+            <span className="ico">⌚</span>
+            <div className="lbl">Bugün Yayınlanan</div>
+            <div className="val">{stats.today}</div>
+            <div className="delta">son 24 saat</div>
+          </div>
+          <div className="stat">
+            <span className="ico">▤</span>
+            <div className="lbl">Son 7 Gün</div>
+            <div className="val">{stats.last7}</div>
+            <div className="delta">haftalık üretim</div>
+          </div>
+        </div>
+
+        <div className="dash-grid">
+          <div className="panel-card">
+            <h3>Son Hareketler <span className="sub">en yeni 6 haber</span></h3>
+            <ul className="activity" style={{padding:0,margin:0}}>
+              {recent.map(n => {
+                const cat = MISP.categoryById(n.category);
+                return (
+                  <li key={n.id}>
+                    <div><span className="dot" style={{background:cat.color}}></span></div>
+                    <div className="txt">
+                      <b>{n.title}</b>
+                      <div style={{color:"var(--muted)",fontSize:12,marginTop:2}}>{cat.name} · {n.author || "MISP Haber"}</div>
+                    </div>
+                    <div className="when">{MISP.timeAgo(n.published)}</div>
+                  </li>
+                );
+              })}
+              {recent.length === 0 && <li><div></div><div style={{color:"var(--muted)"}}>Henüz haber yok.</div><div></div></li>}
+            </ul>
+          </div>
+
+          <div className="panel-card">
+            <h3>Kategori Dağılımı <span className="sub">{news.length} haber</span></h3>
+            <div className="cat-bars">
+              {catStats.map(c => (
+                <div className="cat-bar" key={c.id}>
+                  <div className="row">
+                    <span><b style={{color:c.color}}>●</b> {c.name}</span>
+                    <span className="n">{c.count}</span>
+                  </div>
+                  <div className="track"><div className="fill" style={{width: c.pct + "%", background: c.color}}></div></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// --- List ---------------------------------------------------------
+function NewsList({ news, onEdit, onNew, onDelete, onToggleFeatured }) {
+  const [q, setQ] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [confirmDel, setConfirmDel] = useState(null);
+
+  const filtered = useMemo(() => {
+    let list = news;
+    if (filter !== "all") list = list.filter(n => n.category === filter);
+    if (q.trim()) {
+      const s = q.toLowerCase();
+      list = list.filter(n => n.title.toLowerCase().includes(s) || (n.summary||"").toLowerCase().includes(s));
+    }
+    return list;
+  }, [news, q, filter]);
+
+  return (
+    <>
+      <Topbar title="Tüm Haberler" crumb={`${filtered.length} / ${news.length}`}
+        actions={<button className="btn red" onClick={onNew}>+ Yeni Haber</button>} />
+      <div className="body-area">
+        <div className="toolbar">
+          <input type="text" placeholder="Başlık veya özet içinde ara..." value={q} onChange={e=>setQ(e.target.value)} />
+          <select value={filter} onChange={e=>setFilter(e.target.value)}>
+            <option value="all">Tüm Kategoriler</option>
+            {MISP.CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+          <span className="count">{filtered.length} kayıt</span>
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="empty">
+            <h3>Hiç haber bulunamadı</h3>
+            <p>{news.length === 0 ? "İlk haberinizi ekleyerek başlayın." : "Filtreleri değiştirmeyi deneyin."}</p>
+            {news.length === 0 && <button className="btn red" onClick={onNew}>+ İlk Haberi Ekle</button>}
+          </div>
+        ) : (
+          <table className="news-table">
+            <thead>
+              <tr>
+                <th style={{width:80}}>Görsel</th>
+                <th>Başlık</th>
+                <th style={{width:140}}>Kategori</th>
+                <th style={{width:140}}>Yazar</th>
+                <th style={{width:160}}>Yayın Tarihi</th>
+                <th style={{width:80}}>Manşet</th>
+                <th style={{width:200,textAlign:"right"}}>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(n => {
+                const cat = MISP.categoryById(n.category);
+                return (
+                  <tr key={n.id}>
+                    <td>
+                      <div className="thumb">
+                        {n.image
+                          ? <img src={n.image} alt="" />
+                          : <div className={`ph cat-${n.category}`} style={{width:"100%",height:"100%"}}>{cat.name.slice(0,3)}</div>}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="title">
+                        {n.title}
+                        <span className="ex">{(n.summary||"").slice(0,90)}{(n.summary||"").length>90?"…":""}</span>
+                      </div>
+                    </td>
+                    <td><span className="pill-cat" style={{background:cat.color}}>{cat.name}</span></td>
+                    <td>{n.author || "—"}</td>
+                    <td style={{fontFamily:"JetBrains Mono, monospace", fontSize:12, color:"var(--muted)"}}>
+                      {MISP.formatDate(n.published)}
+                    </td>
+                    <td>
+                      <button className="pill-star" onClick={()=>onToggleFeatured(n.id)} style={{cursor:"pointer"}}>
+                        {n.featured ? "★ Evet" : "☆ Hayır"}
+                      </button>
+                    </td>
+                    <td>
+                      <div className="row-actions">
+                        <a className="btn sm" href={`haber.html?id=${n.id}`} target="_blank">↗</a>
+                        <button className="btn sm" onClick={()=>onEdit(n.id)}>Düzenle</button>
+                        <button className="btn sm ghost-red" onClick={()=>setConfirmDel(n)}>Sil</button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {confirmDel && (
+        <div className="modal-bg" onClick={()=>setConfirmDel(null)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <h3>Haberi sil?</h3>
+            <p>"<b>{confirmDel.title}</b>" başlıklı haber kalıcı olarak silinecek. Bu işlem geri alınamaz.</p>
+            <div className="acts">
+              <button className="btn" onClick={()=>setConfirmDel(null)}>Vazgeç</button>
+              <button className="btn red" onClick={()=>{ onDelete(confirmDel.id); setConfirmDel(null); }}>Evet, Sil</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// --- Editor -------------------------------------------------------
+function Editor({ editingId, onSaved, onCancel, showToast }) {
+  const existing = editingId ? MISP.byId(editingId) : null;
+  const [form, setForm] = useState(() => existing || {
+    title: "",
+    summary: "",
+    content: "",
+    category: "gundem",
+    author: "MISP Haber Editör",
+    image: "",
+    featured: false,
+  });
+  const [drag, setDrag] = useState(false);
+  const fileRef = useRef();
+
+  function set(k, v) { setForm(f => ({...f, [k]: v})); }
+
+  function handleFile(file) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      showToast("Lütfen bir görsel dosyası seçin.", "warn");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("Görsel boyutu 5 MB'tan büyük olamaz.", "warn");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => set("image", e.target.result);
+    reader.readAsDataURL(file);
+  }
+
+  function submit(e) {
+    e.preventDefault();
+    if (!form.title.trim()) { showToast("Başlık zorunludur.", "warn"); return; }
+    if (!form.content.trim()) { showToast("Haber içeriği zorunludur.", "warn"); return; }
+
+    if (editingId) {
+      MISP.update(editingId, form);
+      showToast("Haber başarıyla güncellendi.", "ok");
+    } else {
+      MISP.add(form);
+      showToast("Haber yayınlandı! Anasayfada gözükecek.", "ok");
+    }
+    onSaved();
+  }
+
+  const cat = MISP.categoryById(form.category);
+
+  return (
+    <>
+      <Topbar
+        title={editingId ? "Haberi Düzenle" : "Yeni Haber Ekle"}
+        crumb={editingId ? "Mevcut haber" : "Boş bir form"}
+        actions={
+          <>
+            <button className="btn" onClick={onCancel}>Vazgeç</button>
+            <button className="btn red" onClick={submit}>
+              {editingId ? "Değişiklikleri Kaydet" : "Yayınla"}
+            </button>
+          </>
+        }
+      />
+      <div className="body-area">
+        <form onSubmit={submit}>
+          <div className="editor-grid">
+
+            {/* SOL: Asıl içerik */}
+            <div>
+              <div className="ed-card">
+                <div className="ed-head">Haber İçeriği</div>
+                <div className="ed-body">
+                  <div className="form-field">
+                    <label>Başlık</label>
+                    <input className="title-input" type="text" placeholder="Habere etkileyici bir başlık yazın..."
+                      value={form.title} onChange={e=>set("title", e.target.value)} maxLength={140} />
+                    <div className="hint"><span className="char-count">{form.title.length} / 140</span> Manşette ve listeler de görünecek başlık.</div>
+                  </div>
+
+                  <div className="form-field">
+                    <label>Özet / Spot</label>
+                    <textarea className="summary-input" placeholder="Haberi 1-2 cümleyle özetleyin. Anasayfada bu yazı görünecek."
+                      value={form.summary} onChange={e=>set("summary", e.target.value)} maxLength={300}></textarea>
+                    <div className="hint"><span className="char-count">{form.summary.length} / 300</span></div>
+                  </div>
+
+                  <div className="form-field">
+                    <label>Haber Metni</label>
+                    <textarea placeholder="Haberin tam metnini yazın. Paragrafları boş satırla ayırın."
+                      value={form.content} onChange={e=>set("content", e.target.value)}></textarea>
+                    <div className="hint">Paragrafları boş bir satır bırakarak ayırın. İlk paragraf büyük ilk harfle görüntülenir.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="ed-card" style={{marginTop:20}}>
+                <div className="ed-head">Görsel</div>
+                <div className="ed-body">
+                  {form.image ? (
+                    <div className="image-preview">
+                      <img src={form.image} alt="" />
+                      <button type="button" onClick={()=>set("image","")} title="Görseli kaldır">×</button>
+                    </div>
+                  ) : (
+                    <div
+                      className={`image-upload ${drag ? "drag" : ""}`}
+                      onClick={()=>fileRef.current.click()}
+                      onDragOver={(e)=>{e.preventDefault();setDrag(true);}}
+                      onDragLeave={()=>setDrag(false)}
+                      onDrop={(e)=>{e.preventDefault();setDrag(false);handleFile(e.dataTransfer.files[0]);}}
+                    >
+                      <div className="ico">⇪</div>
+                      <div className="lbl">Görsel yüklemek için tıklayın veya sürükleyin</div>
+                      <div className="sub">JPG, PNG, WebP · Maks. 5 MB</div>
+                    </div>
+                  )}
+                  <input ref={fileRef} type="file" accept="image/*" hidden onChange={e=>handleFile(e.target.files[0])} />
+
+                  <div className="form-field" style={{marginTop:14,marginBottom:0}}>
+                    <label>Veya görsel URL'si girin</label>
+                    <input type="url" placeholder="https://..." value={form.image && form.image.startsWith("data:") ? "" : form.image}
+                      onChange={e=>set("image", e.target.value)} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SAĞ: Meta */}
+            <div>
+              <div className="ed-card">
+                <div className="ed-head">Yayın Bilgileri</div>
+                <div className="ed-body">
+                  <div className="form-field">
+                    <label>Kategori — haberin görüneceği bölüm</label>
+                    <div className="cat-picker">
+                      {MISP.CATEGORIES.map(c => (
+                        <button
+                          type="button"
+                          key={c.id}
+                          className={"cat-chip " + (form.category === c.id ? "active" : "")}
+                          style={form.category === c.id ? {background: c.color, borderColor: c.color, color: "#fff"} : {borderColor: c.color, color: c.color}}
+                          onClick={() => set("category", c.id)}
+                        >
+                          {c.name}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="hint">Bu kategori anasayfanın ilgili bölümünde haberi gösterir.</div>
+                  </div>
+                  <div className="form-field">
+                    <label>Yazar / Servis</label>
+                    <input type="text" value={form.author} onChange={e=>set("author", e.target.value)} placeholder="örn. Türkiye Servisi" />
+                  </div>
+
+                  <div className="toggle-row">
+                    <div className="l">Manşete Çıkar
+                      <span className="h">Anasayfanın üstündeki manşet alanında görünür.</span>
+                    </div>
+                    <label className="switch">
+                      <input type="checkbox" checked={form.featured} onChange={e=>set("featured", e.target.checked)} />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="ed-card" style={{marginTop:20, background:"#fffbea", borderColor:"#ffe79e"}}>
+                <div className="ed-head" style={{borderColor:"#ffe79e", background:"transparent"}}>ℹ Anasayfada nasıl gözükür?</div>
+                <div className="ed-body" style={{fontSize:13, color:"var(--ink-2)", lineHeight:1.6}}>
+                  <p style={{margin:"0 0 8px"}}><b>Manşet alanı:</b> En son eklenen haber büyük olarak en üstte görünür.</p>
+                  <p style={{margin:"0 0 8px"}}><b>Yan haberler (sağ kolon):</b> Manşetten sonraki <b>4 en yeni haber</b> otomatik listelenir. Bir haberin yan tarafta görünmesini istiyorsanız, onu sonradan yayınlayın.</p>
+                  <p style={{margin:0}}><b>Kategori bölümleri:</b> Seçtiğiniz kategori (örn. KKTC) anasayfanın o bölümünde otomatik gösterilir.</p>
+                </div>
+              </div>
+
+              <div className="ed-card" style={{marginTop:20}}>
+                <div className="ed-head">Önizleme</div>
+                <div className="ed-body">
+                  <div className="preview-card">
+                    <span className="tag" style={{color:cat.color}}>{cat.name}</span>
+                    <h4>{form.title || "Haber başlığı burada görünecek"}</h4>
+                    <p>{(form.summary || "Haber özeti burada görünecek. Anasayfada başlığın altında gözükür.").slice(0,140)}</p>
+                    <div className="meta">{form.author || "MISP Haber"} · az önce</div>
+                  </div>
+                  <div style={{fontSize:12,color:"var(--muted)",marginTop:12,lineHeight:1.5}}>
+                    Bu kart anasayfa listelerinde nasıl görüneceğinin yaklaşık bir önizlemesidir.
+                  </div>
+                </div>
+              </div>
+
+              <div className="save-row">
+                <button type="button" className="btn" onClick={onCancel}>Vazgeç</button>
+                <button type="submit" className="btn red" style={{flex:1}}>
+                  {editingId ? "Kaydet" : "Yayınla"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </>
+  );
+}
+
+// --- Categories view ---------------------------------------------
+function CategoriesView({ news, onNavToList }) {
+  return (
+    <>
+      <Topbar title="Kategoriler" crumb="Site bölümleri" />
+      <div className="body-area">
+        <div className="stats" style={{gridTemplateColumns:"repeat(3,1fr)"}}>
+          {MISP.CATEGORIES.map(c => {
+            const items = news.filter(n => n.category === c.id);
+            return (
+              <div className="stat" key={c.id} style={{cursor:"pointer"}} onClick={onNavToList}>
+                <span className="ico" style={{background:c.color,color:"#fff"}}>●</span>
+                <div className="lbl">{c.name}</div>
+                <div className="val">{items.length}</div>
+                <div className="delta" style={{color:c.color}}>
+                  {items[0] ? items[0].title.slice(0,40) + (items[0].title.length>40?"…":"") : "Henüz haber yok"}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="panel-card" style={{marginTop:20}}>
+          <h3>Bilgi <span className="sub">read-only</span></h3>
+          <div style={{padding:18,color:"var(--ink-2)",fontSize:14,lineHeight:1.6}}>
+            Kategoriler sistem tarafından tanımlanır ve şu an için sabittir. Bir haberin kategorisini değiştirmek için
+            <b> Tüm Haberler</b> ekranından ilgili habere "Düzenle" deyin.
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// --- Settings view -----------------------------------------------
+function SettingsView({ onReset }) {
+  const [confirm, setConfirm] = useState(false);
+  return (
+    <>
+      <Topbar title="Ayarlar" crumb="Sistem" />
+      <div className="body-area">
+        <div className="panel-card">
+          <h3>Site Bilgileri</h3>
+          <div style={{padding:18}}>
+            <div className="form-field"><label>Site Adı</label>
+              <input type="text" defaultValue="MISP Haber" disabled />
+            </div>
+            <div className="form-field"><label>İletişim E-posta</label>
+              <input type="text" defaultValue="editor@misphaber.com" disabled />
+            </div>
+            <div className="form-field"><label>Veri Depolama</label>
+              <input type="text" defaultValue="Tarayıcı (localStorage) · misp_haber_news_v1" disabled />
+              <div className="hint">Tüm haberler tarayıcınızın yerel depolama alanında tutulur. Yüklediğiniz her haber anasayfada anında görünür.</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="panel-card" style={{marginTop:20,borderColor:"#f3c8ce"}}>
+          <h3 style={{color:"var(--brand)"}}>Tehlikeli Bölge</h3>
+          <div style={{padding:18}}>
+            <p style={{margin:"0 0 14px",color:"var(--ink-2)",fontSize:14}}>Tüm haberleri silip varsayılan örnek haberleri geri yükler. Bu işlem geri alınamaz.</p>
+            <button className="btn ghost-red" onClick={()=>setConfirm(true)}>Verileri Sıfırla</button>
+          </div>
+        </div>
+      </div>
+
+      {confirm && (
+        <div className="modal-bg" onClick={()=>setConfirm(false)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <h3>Verileri sıfırla?</h3>
+            <p>Tüm mevcut haberler silinecek ve varsayılan örnek haberler yüklenecek.</p>
+            <div className="acts">
+              <button className="btn" onClick={()=>setConfirm(false)}>Vazgeç</button>
+              <button className="btn red" onClick={()=>{ onReset(); setConfirm(false); }}>Evet, Sıfırla</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// --- App shell ----------------------------------------------------
+function App() {
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem(AUTH_KEY) === "1");
+  const [view, setView] = useState("dashboard");
+  const [editingId, setEditingId] = useState(null);
+  const [news, setNews] = useState(() => MISP.all());
+  const [toast, setToast] = useState(null);
+
+  function refresh() { setNews(MISP.all()); }
+
+  useEffect(() => {
+    const h = () => refresh();
+    window.addEventListener("misp:news-updated", h);
+    return () => window.removeEventListener("misp:news-updated", h);
+  }, []);
+
+  function showToast(msg, kind = "ok") {
+    setToast({ msg, kind, id: Date.now() });
+    setTimeout(() => setToast(t => (t && t.msg === msg ? null : t)), 3200);
+  }
+
+  function nav(v) {
+    if (v === "new") { setEditingId(null); setView("editor"); }
+    else { setView(v); }
+  }
+
+  function startEdit(id) { setEditingId(id); setView("editor"); }
+
+  function del(id) {
+    MISP.remove(id);
+    refresh();
+    showToast("Haber silindi.", "warn");
+  }
+
+  function toggleFeatured(id) {
+    const n = MISP.byId(id);
+    MISP.update(id, { featured: !n.featured });
+    refresh();
+  }
+
+  function reset() {
+    MISP.resetSeed();
+    refresh();
+    showToast("Veriler varsayılana sıfırlandı.", "ok");
+  }
+
+  function logout() {
+    sessionStorage.removeItem(AUTH_KEY);
+    setAuthed(false);
+  }
+
+  if (!authed) return <Login onLogin={() => setAuthed(true)} />;
+
+  const stats = { total: news.length, categories: MISP.CATEGORIES.length };
+
+  let activeNav = view === "editor" ? (editingId ? "list" : "new") : view;
+
+  return (
+    <div className="app">
+      <Sidebar active={activeNav} onNav={nav} stats={stats} onLogout={logout} />
+      <main className="content">
+        {view === "dashboard" && <Dashboard news={news} onNav={nav} />}
+        {view === "list" && (
+          <NewsList news={news} onEdit={startEdit} onNew={()=>nav("new")}
+            onDelete={del} onToggleFeatured={toggleFeatured} />
+        )}
+        {view === "editor" && (
+          <Editor editingId={editingId} showToast={showToast}
+            onSaved={() => { setView("list"); setEditingId(null); refresh(); }}
+            onCancel={() => { setView(editingId ? "list" : "dashboard"); setEditingId(null); }} />
+        )}
+        {view === "categories" && <CategoriesView news={news} onNavToList={()=>nav("list")} />}
+        {view === "settings" && <SettingsView onReset={reset} />}
+      </main>
+      {toast && <div className={`toast ${toast.kind}`} key={toast.id}>{toast.msg}</div>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+</script>
+</body>
+</html>

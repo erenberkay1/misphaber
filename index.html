@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MISP Haber — Türkiye ve Dünyadan Son Dakika Haberleri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #c8102e;          /* MISP kırmızı */
+    --brand-dark: #8a0a1f;
+    --ink: #16181d;
+    --ink-2: #3a3f47;
+    --muted: #6b727c;
+    --line: #e4e6ea;
+    --line-2: #f0f1f3;
+    --bg: #ffffff;
+    --bg-tint: #f6f7f9;
+    --accent: #1f4b8a;
+    --tape: #fff8dc;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Source Sans 3", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: var(--brand); }
+  img { display: block; max-width: 100%; }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+
+  /* === TOP STRIP === */
+  .topstrip {
+    background: #0e1014;
+    color: #d9dde4;
+    font-size: 12.5px;
+    border-bottom: 1px solid #1d2027;
+  }
+  .topstrip .wrap { display: flex; align-items: center; justify-content: space-between; height: 34px; }
+  .ticker { display: flex; align-items: center; gap: 18px; overflow: hidden; font-family: "JetBrains Mono", monospace; }
+  .ticker .lbl { color: #ff5e6c; font-weight: 600; letter-spacing: .04em; }
+  .ticker .item { color: #cfd3da; }
+  .ticker .item .up { color: #4ade80; }
+  .ticker .item .down { color: #ff6b6b; }
+  .topstrip .social { display: flex; gap: 14px; }
+  .topstrip .social a { color: #aab0b9; font-size: 13px; }
+  .topstrip .social a:hover { color: #fff; }
+
+  /* === MASTHEAD === */
+  .masthead { border-bottom: 1px solid var(--line); }
+  .masthead .wrap { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 24px; padding: 22px 20px; }
+  .logo {
+    font-family: "Playfair Display", serif;
+    font-weight: 900;
+    font-size: 44px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .logo .m { color: var(--brand); }
+  .logo .sub {
+    font-family: "Source Sans 3", sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: .22em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-left: 6px;
+    transform: translateY(-6px);
+  }
+  .date-meta {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .date-meta .day { color: var(--ink); font-weight: 600; text-transform: uppercase; letter-spacing: .12em; font-size: 11px; }
+  .date-meta .weather { display:inline-flex; align-items:center; gap:6px; margin-top:2px; }
+  .date-meta .weather b { color: var(--ink); }
+
+  .head-right { display: flex; align-items: center; gap: 10px; }
+  .btn-search, .btn-admin {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 38px; padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #fff;
+    font-weight: 600; font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .btn-admin { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .btn-admin:hover { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .btn-search:hover { border-color: var(--ink); }
+
+  /* === NAV === */
+  .nav { background: var(--brand); color: #fff; }
+  .nav .wrap { display: flex; align-items: center; gap: 4px; height: 46px; overflow-x: auto; scrollbar-width: none; }
+  .nav .wrap::-webkit-scrollbar { display:none; }
+  .nav a {
+    color: #fff;
+    font-weight: 700;
+    font-size: 13.5px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 0 14px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    border-right: 1px solid rgba(255,255,255,.12);
+  }
+  .nav a:first-child { border-left: 1px solid rgba(255,255,255,.12); }
+  .nav a:hover, .nav a.active { background: var(--brand-dark); color: #fff; }
+  .nav .pill {
+    margin-left: auto;
+    background: #0e1014;
+    color: #fff;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    display: inline-flex; align-items: center; gap: 6px;
+    border: none;
+  }
+  .pulse {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #ff5e6c; box-shadow: 0 0 0 0 rgba(255,94,108,.7);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,94,108,.7); }
+    70% { box-shadow: 0 0 0 8px rgba(255,94,108,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,94,108,0); }
+  }
+
+  /* === BREAKING BAR === */
+  .breaking {
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 0;
+    overflow: hidden;
+  }
+  .breaking .wrap { display: flex; align-items: center; gap: 14px; }
+  .breaking .badge {
+    background: var(--brand);
+    color: #fff;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  .breaking .scroller {
+    flex: 1; overflow: hidden; position: relative; height: 22px;
+  }
+  .breaking .track {
+    position: absolute; white-space: nowrap;
+    animation: scroll 38s linear infinite;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .breaking .track span { padding: 0 28px; position: relative; }
+  .breaking .track span::after {
+    content: "•"; position: absolute; right: 0; top: 0; color: var(--brand);
+  }
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* === HERO === */
+  .hero { padding: 28px 0 16px; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    gap: 28px;
+  }
+  .lead {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #111;
+    cursor: pointer;
+  }
+  .lead .ph { width: 100%; height: 100%; }
+  .lead .grad {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 35%, rgba(0,0,0,.35) 60%, rgba(0,0,0,.92) 100%);
+  }
+  .lead .meta { position: absolute; left: 0; right: 0; bottom: 0; padding: 28px; color: #fff; }
+  .lead .cat-tag {
+    display: inline-block;
+    background: var(--brand);
+    color: #fff;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-size: 11.5px;
+    padding: 6px 10px;
+    margin-bottom: 12px;
+  }
+  .lead h1 {
+    font-family: "Playfair Display", serif;
+    font-weight: 900;
+    font-size: 38px;
+    line-height: 1.1;
+    margin: 0 0 10px;
+    text-wrap: balance;
+  }
+  .lead p {
+    font-size: 16px;
+    margin: 0;
+    opacity: .9;
+    max-width: 80%;
+  }
+  .lead .time {
+    margin-top: 12px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    opacity: .75;
+    letter-spacing: .05em;
+  }
+
+  .side-list { display: flex; flex-direction: column; gap: 18px; }
+  .side-item {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 14px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .side-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .side-item .thumb { aspect-ratio: 4/3; background: #eef0f3; overflow: hidden; }
+  .side-item .cat-tag {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .side-item h3 {
+    font-family: "Playfair Display", serif;
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1.25;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  .side-item .time {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* placeholder image */
+  .ph {
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,.04) 0 12px, transparent 12px 24px),
+      linear-gradient(135deg, var(--c1, #c8102e) 0%, var(--c2, #8a0a1f) 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,.85);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 12px;
+  }
+  .ph.cat-gundem    { --c1: #c8102e; --c2: #8a0a1f; }
+  .ph.cat-politika  { --c1: #1f4b8a; --c2: #0e2a52; }
+  .ph.cat-dunya     { --c1: #2a6fdb; --c2: #1a4791; }
+  .ph.cat-ekonomi   { --c1: #0b7a3b; --c2: #044a23; }
+  .ph.cat-spor      { --c1: #d35400; --c2: #8a3700; }
+  .ph.cat-magazin   { --c1: #a33089; --c2: #6a1c58; }
+  .ph.cat-saglik    { --c1: #0d8c8c; --c2: #075959; }
+  .ph.cat-teknoloji { --c1: #5a3da6; --c2: #382562; }
+  .ph.cat-kultur    { --c1: #7a5c2e; --c2: #4a371b; }
+
+  /* === SECTION BAR === */
+  .sec { padding: 36px 0; border-top: 1px solid var(--line); }
+  .sec-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .sec-title {
+    font-family: "Playfair Display", serif;
+    font-weight: 900;
+    font-size: 28px;
+    margin: 0;
+    display: flex; align-items: baseline; gap: 14px;
+  }
+  .sec-title::before {
+    content: "";
+    width: 8px; height: 26px;
+    background: var(--brand);
+    display: inline-block;
+    transform: translateY(4px);
+  }
+  .sec-more { font-size: 13px; font-weight: 600; color: var(--brand); text-transform: uppercase; letter-spacing: .1em; }
+
+  /* === LATEST FEED === */
+  .feed-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 36px;
+  }
+  .card-list { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .card { cursor: pointer; }
+  .card .thumb { aspect-ratio: 16/10; overflow: hidden; margin-bottom: 12px; }
+  .card .thumb .ph { width:100%; height:100%; }
+  .card .cat-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .card h3 {
+    font-family: "Playfair Display", serif;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1.2;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .card .excerpt { color: var(--ink-2); font-size: 14px; margin: 0 0 10px; }
+  .card .meta { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--muted); display: flex; gap: 10px; }
+  .card .meta b { color: var(--ink); font-weight: 500; }
+
+  /* === SIDEBAR === */
+  .sidebar { display: flex; flex-direction: column; gap: 28px; }
+  .panel { border: 1px solid var(--line); padding: 20px; }
+  .panel.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .panel .panel-title {
+    font-family: "Playfair Display", serif;
+    font-weight: 900;
+    font-size: 18px;
+    margin: 0 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .panel.dark .panel-title { border-color: rgba(255,255,255,.15); }
+
+  .most-read { display: flex; flex-direction: column; gap: 14px; }
+  .most-read li {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 10px;
+    list-style: none;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--line);
+    cursor: pointer;
+  }
+  .most-read li:last-child { border-bottom: none; padding-bottom: 0; }
+  .most-read .num {
+    font-family: "Playfair Display", serif;
+    font-weight: 900;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--brand);
+  }
+  .most-read h4 {
+    font-weight: 600;
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.3;
+  }
+  .most-read .t { font-family:"JetBrains Mono", monospace; font-size: 10.5px; color: var(--muted); margin-top: 4px; display: block; }
+
+  .newsletter input {
+    width: 100%; height: 40px; padding: 0 12px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+    color: #fff; font: inherit; font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .newsletter button {
+    width: 100%; height: 40px;
+    background: var(--brand); color: #fff; border: none;
+    font-weight: 800; text-transform: uppercase; letter-spacing: .1em; font-size: 12px; cursor: pointer;
+  }
+  .newsletter p { font-size: 13px; opacity: .8; margin: 0 0 12px; }
+
+  /* === CATEGORY STRIPS === */
+  .cat-strip { padding: 32px 0; border-top: 1px solid var(--line); }
+  .strip-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 24px; align-items: start; }
+  .strip-big .thumb { aspect-ratio: 16/11; margin-bottom: 14px; }
+  .strip-big h3 {
+    font-family: "Playfair Display", serif;
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 1.2;
+    margin: 0 0 8px;
+  }
+  .strip-big p { color: var(--ink-2); font-size: 15px; margin: 0; }
+  .strip-list { display: flex; flex-direction: column; gap: 16px; }
+  .strip-list .item {
+    display: grid; grid-template-columns: 90px 1fr; gap: 12px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .strip-list .item:last-child { border: none; padding-bottom: 0; }
+  .strip-list .item .thumb { aspect-ratio: 1/1; }
+  .strip-list h4 {
+    font-family: "Playfair Display", serif;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.25;
+    margin: 0;
+  }
+  .strip-list .t { font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: var(--muted); margin-top: 6px; display: block; }
+
+  /* === QUOTE === */
+  .quote-band {
+    background: var(--bg-tint);
+    padding: 50px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .quote-band .q {
+    font-family: "Playfair Display", serif;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.3;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .quote-band .q::before { content: "“"; color: var(--brand); margin-right: 4px; }
+  .quote-band .q::after { content: "”"; color: var(--brand); margin-left: 4px; }
+  .quote-band .att {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  /* === FOOTER === */
+  footer { background: #0e1014; color: #c5c9d1; padding: 50px 0 0; margin-top: 50px; }
+  footer .grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 36px; }
+  footer h5 {
+    color: #fff;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    margin: 0 0 14px;
+    font-weight: 700;
+  }
+  footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+  footer a:hover { color: #fff; }
+  footer .brand-block .logo { color: #fff; font-size: 36px; margin-bottom: 12px; }
+  footer .brand-block .logo .m { color: var(--brand); }
+  footer .brand-block p { font-size: 14px; color: #9ba0aa; line-height: 1.6; }
+  footer .copy {
+    margin-top: 40px; padding: 18px 0;
+    border-top: 1px solid #1d2027;
+    font-size: 12px;
+    color: #6b727c;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  /* === DETAIL POPUP / ROUTING === */
+  /* haber detayı haber.html'e gider — burada bir şey yok */
+
+  @media (max-width: 900px) {
+    .hero-grid, .feed-grid, .strip-grid, footer .grid { grid-template-columns: 1fr; }
+    .card-list { grid-template-columns: 1fr; }
+    .lead h1 { font-size: 28px; }
+    .lead .meta { padding: 18px; }
+    .logo { font-size: 32px; }
+    .date-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP STRIP -->
+<div class="topstrip">
+  <div class="wrap">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8a909a; letter-spacing: .08em;">MISP HABER · GÜVENİLİR HABERCİLİK</div>
+    <div class="social">
+      <a href="#" title="Twitter">𝕏</a>
+      <a href="#" title="Instagram">◉</a>
+      <a href="#" title="YouTube">▶</a>
+      <a href="#" title="Facebook">f</a>
+    </div>
+  </div>
+</div>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="wrap">
+    <a href="index.html" class="logo">
+      <span class="m">M</span>ISP<span style="color:var(--brand)">.</span>Haber
+      <span class="sub">— MİLLETİN İRADESİ</span>
+    </a>
+    <div class="head-right">
+      <button class="btn-search" onclick="document.getElementById('searchInput').focus()">🔍 Ara</button>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap" id="navWrap">
+    <a href="index.html" class="active">Anasayfa</a>
+    <!-- kategoriler JS ile -->
+  </div>
+</nav>
+
+<!-- BREAKING BAR (kaldırıldı) -->
+
+<!-- HERO -->
+<section class="wrap hero">
+  <div class="hero-grid">
+    <div class="lead" id="leadSlot"></div>
+    <div class="side-list" id="sideList"></div>
+  </div>
+</section>
+
+<!-- LATEST -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title">Son Haberler</h2>
+      <a href="#" class="sec-more">Tümünü gör →</a>
+    </div>
+    <div class="feed-grid">
+      <div class="card-list" id="latestList"></div>
+      <aside class="sidebar">
+        <div class="panel">
+          <h3 class="panel-title">Çok Okunanlar</h3>
+          <ul class="most-read" id="mostRead"></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORY STRIP: TÜRKİYE -->
+<section class="cat-strip" id="cat-turkiye">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title" style="color:#1f4b8a">Türkiye</h2>
+      <a href="#" class="sec-more">Daha fazla →</a>
+    </div>
+    <div class="strip-grid" id="turkiyeStrip"></div>
+  </div>
+</section>
+
+<!-- CATEGORY STRIP: KKTC -->
+<section class="cat-strip" id="cat-kktc">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title" style="color:#0b7a3b">KKTC</h2>
+      <a href="#" class="sec-more">Daha fazla →</a>
+    </div>
+    <div class="strip-grid" id="kktcStrip"></div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-band">
+  <div class="wrap">
+    <p class="q">Habere saygı, gerçeğe sadakattir. Bağımsız sesi olmak için doğruluğu birinci ilke kabul ederiz.</p>
+    <div class="att">— MISP HABER YAYIN KURULU</div>
+  </div>
+</section>
+
+<!-- CATEGORY STRIP: DÜNYA -->
+<section class="cat-strip" id="cat-dunya">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title" style="color:#2a6fdb">Dünya</h2>
+      <a href="#" class="sec-more">Daha fazla →</a>
+    </div>
+    <div class="strip-grid" id="dunyaStrip"></div>
+  </div>
+</section>
+
+<!-- CATEGORY STRIP: EKONOMİ -->
+<section class="cat-strip" id="cat-ekonomi">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="sec-title" style="color:#a33089">Ekonomi</h2>
+      <a href="#" class="sec-more">Daha fazla →</a>
+    </div>
+    <div class="strip-grid" id="ekonomiStrip"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="grid">
+      <div class="brand-block">
+        <div class="logo"><span class="m">M</span>ISP<span style="color:var(--brand)">.</span>Haber</div>
+        <p>Türkiye ve dünyadan son dakika haberlerini bağımsız bakış açısıyla okuyucuya ulaştıran dijital haber platformu.</p>
+      </div>
+      <div>
+        <h5>Kategoriler</h5>
+        <ul id="footCats"></ul>
+      </div>
+      <div>
+        <h5>Kurumsal</h5>
+        <ul>
+          <li><a href="#">Hakkımızda</a></li>
+          <li><a href="#">Yayın İlkelerimiz</a></li>
+          <li><a href="#">İletişim</a></li>
+          <li><a href="#">Reklam</a></li>
+          <li><a href="#">İnsan Kaynakları</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Servisler</h5>
+        <ul>
+          <li><a href="#">Mobil Uygulama</a></li>
+          <li><a href="#">RSS</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">
+      <span>© 2026 MISP Haber · Tüm hakları saklıdır.</span>
+      <span>v1.0 · Bağımsız habercilik için.</span>
+    </div>
+  </div>
+</footer>
+
+<input type="hidden" id="searchInput" />
+
+<script src="data.js"></script>
+<script>
+  // ===== HEADER tarih (kaldırıldı) =====
+
+  // ===== NAV kategorileri =====
+  const navWrap = document.getElementById("navWrap");
+  MISP.CATEGORIES.forEach(c => {
+    const a = document.createElement("a");
+    a.textContent = c.name;
+    a.href = "#cat-" + c.id;
+    navWrap.appendChild(a);
+  });
+
+  // Footer kategorileri
+  const footCats = document.getElementById("footCats");
+  MISP.CATEGORIES.forEach(c => {
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="#cat-${c.id}">${c.name}</a>`;
+    footCats.appendChild(li);
+  });
+
+  // ===== Helpers =====
+  function placeholder(n) {
+    return `<div class="ph cat-${n.category}">${MISP.categoryById(n.category).name} · görsel</div>`;
+  }
+  function thumbHTML(n) {
+    if (n.image) return `<img src="${n.image}" alt="" style="width:100%;height:100%;object-fit:cover" />`;
+    return placeholder(n);
+  }
+  function link(n) { return `haber.html?id=${encodeURIComponent(n.id)}`; }
+  function catTagHTML(n) {
+    const c = MISP.categoryById(n.category);
+    return `<span class="cat-tag" style="color:${c.color}">${c.name}</span>`;
+  }
+
+  // ===== Breaking ticker (kaldırıldı) =====
+  function renderBreaking() { /* no-op */ }
+
+  // ===== HERO =====
+  function renderHero() {
+    const list = MISP.all();
+    if (list.length === 0) return;
+    const [lead, ...rest] = list;
+    const side = rest.slice(0, 4);
+    document.getElementById("leadSlot").innerHTML = `
+      <a href="${link(lead)}" style="display:block;width:100%;height:100%;position:relative;color:#fff">
+        <div style="width:100%;height:100%">${thumbHTML(lead)}</div>
+        <div class="grad"></div>
+        <div class="meta">
+          <span class="cat-tag" style="background:${MISP.categoryById(lead.category).color}">${MISP.categoryById(lead.category).name}</span>
+          <h1>${lead.title}</h1>
+          <p>${lead.summary || ""}</p>
+          <div class="time">${MISP.timeAgo(lead.published).toUpperCase()} · ${lead.author || "MISP Haber"}</div>
+        </div>
+      </a>`;
+    document.getElementById("sideList").innerHTML = side.map(n => `
+      <a class="side-item" href="${link(n)}">
+        <div class="thumb">${thumbHTML(n)}</div>
+        <div>
+          ${catTagHTML(n)}
+          <h3>${n.title}</h3>
+          <div class="time">${MISP.timeAgo(n.published)}</div>
+        </div>
+      </a>
+    `).join("");
+  }
+
+  // ===== LATEST =====
+  function renderLatest() {
+    const list = MISP.all().slice(5, 11);
+    document.getElementById("latestList").innerHTML = list.map(n => `
+      <a class="card" href="${link(n)}">
+        <div class="thumb">${thumbHTML(n)}</div>
+        ${catTagHTML(n)}
+        <h3>${n.title}</h3>
+        <p class="excerpt">${(n.summary || "").slice(0, 110)}${(n.summary || "").length > 110 ? "…" : ""}</p>
+        <div class="meta"><span>${MISP.timeAgo(n.published)}</span><span>·</span><b>${n.author || "MISP Haber"}</b></div>
+      </a>
+    `).join("") || `<div style="color:var(--muted);padding:40px">Henüz haber yok.</div>`;
+
+    document.getElementById("mostRead").innerHTML = MISP.all().slice(0, 5).map((n, i) => `
+      <a href="${link(n)}" style="display:contents">
+        <li>
+          <div class="num">${i+1}</div>
+          <div>
+            <h4>${n.title}</h4>
+            <span class="t">${MISP.categoryById(n.category).name.toUpperCase()} · ${MISP.timeAgo(n.published)}</span>
+          </div>
+        </li>
+      </a>
+    `).join("");
+  }
+
+  // ===== CATEGORY STRIPS =====
+  function renderStrip(catId, mountId) {
+    const items = MISP.byCategory(catId);
+    const mount = document.getElementById(mountId);
+    if (!mount) return;
+    if (items.length === 0) {
+      mount.innerHTML = `<div style="color:var(--muted);grid-column:1/-1">Bu kategoride henüz haber yok.</div>`;
+      return;
+    }
+    const [big, ...rest] = items;
+    const list = rest.slice(0, 5);
+    mount.innerHTML = `
+      <a class="strip-big" href="${link(big)}">
+        <div class="thumb">${thumbHTML(big)}</div>
+        ${catTagHTML(big)}
+        <h3>${big.title}</h3>
+        <p>${(big.summary || "").slice(0, 140)}</p>
+      </a>
+      <div class="strip-list">
+        ${list.slice(0,3).map(n => `
+          <a class="item" href="${link(n)}">
+            <div class="thumb">${thumbHTML(n)}</div>
+            <div>
+              <h4>${n.title}</h4>
+              <span class="t">${MISP.timeAgo(n.published)}</span>
+            </div>
+          </a>
+        `).join("")}
+      </div>
+      <div class="strip-list">
+        ${list.slice(3,6).map(n => `
+          <a class="item" href="${link(n)}">
+            <div class="thumb">${thumbHTML(n)}</div>
+            <div>
+              <h4>${n.title}</h4>
+              <span class="t">${MISP.timeAgo(n.published)}</span>
+            </div>
+          </a>
+        `).join("") || '<div style="color:var(--muted);font-size:13px">Bu kategoride başka haber bulunmuyor.</div>'}
+      </div>
+    `;
+  }
+
+  function renderAll() {
+    renderBreaking();
+    renderHero();
+    renderLatest();
+    renderStrip("turkiye", "turkiyeStrip");
+    renderStrip("kktc", "kktcStrip");
+    renderStrip("dunya", "dunyaStrip");
+    renderStrip("ekonomi", "ekonomiStrip");
+  }
+
+  renderAll();
+  window.addEventListener("misp:news-updated", renderAll);
+</script>
+
+</body>
+</html>
