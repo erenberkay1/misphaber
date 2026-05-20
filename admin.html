@@ -509,29 +509,142 @@
 
 <div id="root"></div>
 
-<script src="data.js"></script>
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+(function () {
+  const _cfg = {
+    apiKey: "AIzaSyCdB1E_QPW9hUkerftOks1XfUeY6lXGlZ0",
+    authDomain: "misphaber.firebaseapp.com",
+    projectId: "misphaber",
+    storageBucket: "misphaber.firebasestorage.app",
+    messagingSenderId: "165920201061",
+    appId: "1:165920201061:web:59e313f53931d76458a98c"
+  };
+  firebase.initializeApp(_cfg);
+  const _db  = firebase.firestore();
+  const _auth = firebase.auth();
+
+  const CATEGORIES = [
+    { id: "gundem",  name: "Gündem",  color: "#c8102e" },
+    { id: "turkiye", name: "Türkiye", color: "#1f4b8a" },
+    { id: "kktc",    name: "KKTC",    color: "#0b7a3b" },
+    { id: "dunya",   name: "Dünya",   color: "#2a6fdb" },
+    { id: "ekonomi", name: "Ekonomi", color: "#a33089" },
+  ];
+
+  const SEED = [
+    { title: "Merkez Bankası faiz kararını açıkladı: Piyasalar nasıl tepki verdi?", summary: "Para Politikası Kurulu yıl sonu beklentilerini de etkileyecek kararını duyurdu.", content: "Merkez Bankası bugün yaptığı toplantıda politika faizini değerlendirdi. Enflasyonla mücadelede kararlılığın süreceği vurgulandı.\n\nPiyasa aktörleri kararın ardından ilk tepkilerini verdi. Borsa endeksi gün içinde dalgalı seyretti.", category: "ekonomi", author: "Ekonomi Servisi", image: "", featured: true },
+    { title: "Yeni eğitim yılında müfredat değişiklikleri: Veliler ne bilmeli?", summary: "Milli Eğitim Bakanlığı'nın yeni müfredatıyla birlikte ders saatleri ve içerik düzenlemeleri başlıyor.", content: "Eğitim öğretim yılı yaklaşırken müfredattaki değişiklikler tartışılıyor. Dijital okuryazarlık derslerinin ağırlığı artıyor.\n\nVelilere yönelik rehber, okul-aile işbirliğini güçlendirmeyi amaçlıyor.", category: "turkiye", author: "Türkiye Servisi", image: "", featured: true },
+    { title: "KKTC'de turizm sezonu rekor doluluk oranıyla açıldı", summary: "Otelcilik sektörü temsilcileri sezonun ilk ayında doluluk oranlarının yüzde 90'ı geçtiğini açıkladı.", content: "KKTC'de turizm sektörü beklentilerin üzerinde bir performansla sezona başladı. Yabancı ziyaretçi sayısında belirgin artış var.\n\nUlusal havayolu şirketleri de sefer sayılarını artırdı.", category: "kktc", author: "KKTC Servisi", image: "", featured: true },
+    { title: "Yapay zekâ destekli yeni telefon modeli tanıtıldı", summary: "Cihaz, görüntü işleme ve dil modeli özellikleriyle dikkat çekiyor. Türkiye satış tarihi de belli oldu.", content: "Teknoloji devinin yeni amiral gemisi cihazı görsel arama ve gerçek zamanlı çeviri özellikleriyle gündeme oturdu.\n\nFiyatlama ülkeye göre değişiklik gösterecek. Türkiye'deki ön satışlar önümüzdeki ay başlıyor.", category: "ekonomi", author: "Teknoloji Masası", image: "", featured: false },
+    { title: "Akdeniz'de yaz turizmi rekoru: Doluluk oranları yüzde 95'i geçti", summary: "Tatil bölgelerinde otel doluluk oranları beklentilerin üzerine çıktı.", content: "Yaz sezonu boyunca süren yoğunluk sektör temsilcilerinin yüzünü güldürdü. Yabancı turist sayısındaki artışın yanı sıra iç turizmde de hareketlilik var.", category: "turkiye", author: "Şehir Servisi", image: "", featured: false },
+    { title: "Sağlık uzmanlarından mevsim geçişi uyarısı", summary: "Doktorlar, mevsim geçişlerinde alınması gereken önlemleri ve beslenme önerilerini paylaştı.", content: "Mevsim geçişleriyle birlikte üst solunum yolu enfeksiyonlarında artış gözleniyor. Uzmanlar bol sıvı tüketimi ve düzenli uyku öneriyor.", category: "gundem", author: "Sağlık Masası", image: "", featured: false },
+    { title: "Avrupa Parlamentosu kritik oylama için toplanıyor", summary: "Gündemdeki yasa tasarısı tartışmalara neden olurken üye ülkelerin tutumu merak ediliyor.", content: "Avrupa Parlamentosu önümüzdeki hafta kritik bir oylama gerçekleştirecek. Tasarı üye ülkeler arasında farklı görüşlere yol açıyor.", category: "dunya", author: "Dünya Servisi", image: "", featured: false },
+  ];
+
+  // --- Firestore helpers ---
+  async function all() {
+    const snap = await _db.collection("news").orderBy("published","desc").get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  async function byId(id) {
+    const doc = await _db.collection("news").doc(id).get();
+    return doc.exists ? { id: doc.id, ...doc.data() } : null;
+  }
+  async function byCategory(catId) {
+    const snap = await _db.collection("news")
+      .where("category","==",catId).orderBy("published","desc").get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  async function add(news) {
+    const item = { published: Date.now(), image: "", featured: false, ...news };
+    const ref = await _db.collection("news").add(item);
+    return { id: ref.id, ...item };
+  }
+  async function update(id, patch) {
+    await _db.collection("news").doc(id).update(patch);
+  }
+  async function remove(id) {
+    await _db.collection("news").doc(id).delete();
+  }
+  async function resetSeed() {
+    const snap = await _db.collection("news").get();
+    const b = _db.batch();
+    snap.docs.forEach(d => b.delete(d.ref));
+    await b.commit();
+    const b2 = _db.batch();
+    const now = Date.now();
+    SEED.forEach((s,i) => {
+      const r = _db.collection("news").doc();
+      b2.set(r, { ...s, published: now - i * 1000 * 60 * 60 * 3 });
+    });
+    await b2.commit();
+  }
+  function subscribe(cb) {
+    return _db.collection("news").orderBy("published","desc").onSnapshot(snap => {
+      cb(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+  }
+
+  // --- Auth helpers ---
+  async function login(email, pass) {
+    await _auth.signInWithEmailAndPassword(email, pass);
+  }
+  async function logout() { await _auth.signOut(); }
+  function onAuthChange(cb) { return _auth.onAuthStateChanged(cb); }
+
+  // --- Sync helpers ---
+  function categoryById(id) {
+    return CATEGORIES.find(c => c.id === id) || { name: id, color: "#444" };
+  }
+  function timeAgo(ts) {
+    const diff = Date.now() - ts;
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return "az önce";
+    if (m < 60) return m + " dakika önce";
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + " saat önce";
+    const d = Math.floor(h / 24);
+    if (d < 7) return d + " gün önce";
+    return new Date(ts).toLocaleDateString("tr-TR");
+  }
+  function formatDate(ts) {
+    return new Date(ts).toLocaleString("tr-TR", {
+      day:"2-digit", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit"
+    });
+  }
+
+  window.MISP = {
+    CATEGORIES, all, byId, byCategory, add, update, remove,
+    resetSeed, subscribe, login, logout, onAuthChange,
+    categoryById, timeAgo, formatDate,
+  };
+})();
+</script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 <script type="text/babel" data-presets="react">
 /* MISP Haber - Admin Paneli */
 const { useState, useEffect, useMemo, useRef } = React;
 
-const AUTH_KEY = "misp_haber_auth_v1";
-
 // --- Login --------------------------------------------------------
-function Login({ onLogin }) {
-  const [user, setUser] = useState("");
-  const [pass, setPass] = useState("");
-  const [err, setErr] = useState("");
+function Login() {
+  const [email, setEmail] = useState("admin@misphaber.com");
+  const [pass, setPass]   = useState("");
+  const [err, setErr]     = useState("");
+  const [busy, setBusy]   = useState(false);
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
-    if (user.trim() === "admin" && pass === "123") {
-      sessionStorage.setItem(AUTH_KEY, "1");
-      onLogin();
-    } else {
-      setErr("Kullanıcı adı veya şifre hatalı.");
+    setBusy(true); setErr("");
+    try {
+      await MISP.login(email, pass);
+    } catch {
+      setErr("E-posta veya şifre hatalı.");
+      setBusy(false);
     }
   }
 
@@ -540,43 +653,39 @@ function Login({ onLogin }) {
       <div className="login-card">
         <div className="login-logo"><span className="m">M</span>ISP<span style={{color:"#c8102e"}}>.</span>Haber</div>
         <div className="login-sub">İçerik Yönetimi</div>
-
         <h2>Giriş</h2>
-        <p className="hint">Devam etmek için lütfen hesabınızla giriş yapın.</p>
-
+        <p className="hint">Devam etmek için Firebase hesabınızla giriş yapın.</p>
         <form onSubmit={submit} autoComplete="off">
           {err && <div className="err">⚠ {err}</div>}
           <div className="field">
-            <label>Kullanıcı Adı</label>
-            <input type="text" value={user} onChange={e=>setUser(e.target.value)} autoFocus />
+            <label>E-posta</label>
+            <input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoFocus />
           </div>
           <div className="field">
             <label>Şifre</label>
             <input type="password" value={pass} onChange={e=>setPass(e.target.value)} />
           </div>
-          <button type="submit" className="btn-primary">Giriş Yap</button>
+          <button type="submit" className="btn-primary" disabled={busy}>
+            {busy ? "Giriş yapılıyor..." : "Giriş Yap"}
+          </button>
         </form>
-
-        <div className="login-back">
-          <a href="index.html">← Anasayfaya dön</a>
-        </div>
+        <div className="login-back"><a href="index.html">← Anasayfaya dön</a></div>
       </div>
     </div>
   );
 }
 
-// --- Sidebar ------------------------------------------------------
-function Sidebar({ active, onNav, stats, onLogout }) {
-  const items = [
-    { id: "dashboard", label: "Panel",            ico: "▦" },
-    { id: "list",      label: "Tüm Haberler",     ico: "≡", count: stats.total },
-    { id: "new",       label: "Yeni Haber Ekle",  ico: "+" },
+// --- Sidebar -------------------------------------------------------
+function Sidebar({ active, onNav, stats, onLogout, userEmail }) {
+  const items  = [
+    { id:"dashboard", label:"Panel",           ico:"▦" },
+    { id:"list",      label:"Tüm Haberler",    ico:"≡", count:stats.total },
+    { id:"new",       label:"Yeni Haber Ekle", ico:"+" },
   ];
   const items2 = [
-    { id: "categories", label: "Kategoriler", ico: "◧", count: stats.categories },
-    { id: "settings",   label: "Ayarlar",     ico: "⚙" },
+    { id:"categories", label:"Kategoriler", ico:"◧", count:stats.categories },
+    { id:"settings",   label:"Ayarlar",     ico:"⚙" },
   ];
-
   return (
     <aside className="side">
       <div className="side-logo">
@@ -586,32 +695,34 @@ function Sidebar({ active, onNav, stats, onLogout }) {
       <div className="side-nav">
         <div className="group">İçerik</div>
         {items.map(it => (
-          <button key={it.id} className={active === it.id ? "active" : ""} onClick={() => onNav(it.id)}>
+          <button key={it.id} className={active===it.id?"active":""} onClick={()=>onNav(it.id)}>
             <span className="ico">{it.ico}</span>{it.label}
-            {typeof it.count === "number" && <span className="count">{it.count}</span>}
+            {typeof it.count==="number" && <span className="count">{it.count}</span>}
           </button>
         ))}
         <div className="group">Site</div>
         {items2.map(it => (
-          <button key={it.id} className={active === it.id ? "active" : ""} onClick={() => onNav(it.id)}>
+          <button key={it.id} className={active===it.id?"active":""} onClick={()=>onNav(it.id)}>
             <span className="ico">{it.ico}</span>{it.label}
-            {typeof it.count === "number" && <span className="count">{it.count}</span>}
+            {typeof it.count==="number" && <span className="count">{it.count}</span>}
           </button>
         ))}
         <div className="group">Hızlı Erişim</div>
-        <button onClick={() => window.open("index.html", "_blank")}>
+        <button onClick={()=>window.open("index.html","_blank")}>
           <span className="ico">↗</span>Siteyi Görüntüle
         </button>
       </div>
       <div className="side-foot">
-        <a href="#" onClick={(e)=>{e.preventDefault();onLogout();}}>↩ Çıkış Yap</a>
+        <div style={{fontSize:11,color:"#8a909a",marginBottom:6,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{userEmail}</div>
+        <a href="#" onClick={e=>{e.preventDefault();onLogout();}}>↩ Çıkış Yap</a>
       </div>
     </aside>
   );
 }
 
 // --- Topbar -------------------------------------------------------
-function Topbar({ title, crumb, actions }) {
+function Topbar({ title, crumb, actions, userEmail }) {
+  const initials = (userEmail||"A").charAt(0).toUpperCase();
   return (
     <div className="topbar">
       <h1>{title}</h1>
@@ -620,8 +731,8 @@ function Topbar({ title, crumb, actions }) {
         {actions}
         <a className="btn sm" href="index.html" target="_blank">↗ Siteyi Aç</a>
         <div className="who">
-          <span className="avatar">A</span>
-          <span>admin</span>
+          <span className="avatar">{initials}</span>
+          <span>{userEmail || "admin"}</span>
         </div>
       </div>
     </div>
@@ -629,88 +740,63 @@ function Topbar({ title, crumb, actions }) {
 }
 
 // --- Dashboard ----------------------------------------------------
-function Dashboard({ news, onNav }) {
+function Dashboard({ news, onNav, userEmail }) {
   const stats = useMemo(() => {
-    const total = news.length;
-    const featured = news.filter(n => n.featured).length;
-    const today = news.filter(n => Date.now() - n.published < 24*3600*1000).length;
-    const last7 = news.filter(n => Date.now() - n.published < 7*24*3600*1000).length;
+    const total    = news.length;
+    const featured = news.filter(n=>n.featured).length;
+    const today    = news.filter(n=>Date.now()-n.published < 86400000).length;
+    const last7    = news.filter(n=>Date.now()-n.published < 604800000).length;
     return { total, featured, today, last7 };
   }, [news]);
 
   const catStats = useMemo(() => {
-    const max = Math.max(1, ...MISP.CATEGORIES.map(c => news.filter(n => n.category === c.id).length));
-    return MISP.CATEGORIES.map(c => {
-      const count = news.filter(n => n.category === c.id).length;
-      return { ...c, count, pct: Math.round((count / max) * 100) };
-    }).sort((a,b) => b.count - a.count);
+    const max = Math.max(1,...MISP.CATEGORIES.map(c=>news.filter(n=>n.category===c.id).length));
+    return MISP.CATEGORIES.map(c=>{
+      const count = news.filter(n=>n.category===c.id).length;
+      return {...c, count, pct:Math.round((count/max)*100)};
+    }).sort((a,b)=>b.count-a.count);
   }, [news]);
 
-  const recent = news.slice(0, 6);
+  const recent = news.slice(0,6);
 
   return (
     <>
-      <Topbar title="Yönetim Paneli" crumb="Genel Bakış"
-        actions={<button className="btn red" onClick={() => onNav("new")}>+ Yeni Haber</button>} />
+      <Topbar title="Yönetim Paneli" crumb="Genel Bakış" userEmail={userEmail}
+        actions={<button className="btn red" onClick={()=>onNav("new")}>+ Yeni Haber</button>} />
       <div className="body-area">
         <div className="stats">
-          <div className="stat">
-            <span className="ico">≡</span>
-            <div className="lbl">Toplam Haber</div>
-            <div className="val">{stats.total}</div>
-            <div className="delta up">▲ Aktif yayında</div>
-          </div>
-          <div className="stat">
-            <span className="ico">★</span>
-            <div className="lbl">Manşet Haberler</div>
-            <div className="val">{stats.featured}</div>
-            <div className="delta up">Anasayfada öne çıkan</div>
-          </div>
-          <div className="stat">
-            <span className="ico">⌚</span>
-            <div className="lbl">Bugün Yayınlanan</div>
-            <div className="val">{stats.today}</div>
-            <div className="delta">son 24 saat</div>
-          </div>
-          <div className="stat">
-            <span className="ico">▤</span>
-            <div className="lbl">Son 7 Gün</div>
-            <div className="val">{stats.last7}</div>
-            <div className="delta">haftalık üretim</div>
-          </div>
+          <div className="stat"><span className="ico">≡</span><div className="lbl">Toplam Haber</div><div className="val">{stats.total}</div><div className="delta up">▲ Aktif yayında</div></div>
+          <div className="stat"><span className="ico">★</span><div className="lbl">Manşet Haberler</div><div className="val">{stats.featured}</div><div className="delta up">Anasayfada öne çıkan</div></div>
+          <div className="stat"><span className="ico">⌚</span><div className="lbl">Bugün Yayınlanan</div><div className="val">{stats.today}</div><div className="delta">son 24 saat</div></div>
+          <div className="stat"><span className="ico">▤</span><div className="lbl">Son 7 Gün</div><div className="val">{stats.last7}</div><div className="delta">haftalık üretim</div></div>
         </div>
-
         <div className="dash-grid">
           <div className="panel-card">
             <h3>Son Hareketler <span className="sub">en yeni 6 haber</span></h3>
             <ul className="activity" style={{padding:0,margin:0}}>
-              {recent.map(n => {
-                const cat = MISP.categoryById(n.category);
+              {recent.map(n=>{
+                const cat=MISP.categoryById(n.category);
                 return (
                   <li key={n.id}>
                     <div><span className="dot" style={{background:cat.color}}></span></div>
                     <div className="txt">
                       <b>{n.title}</b>
-                      <div style={{color:"var(--muted)",fontSize:12,marginTop:2}}>{cat.name} · {n.author || "MISP Haber"}</div>
+                      <div style={{color:"var(--muted)",fontSize:12,marginTop:2}}>{cat.name} · {n.author||"MISP Haber"}</div>
                     </div>
                     <div className="when">{MISP.timeAgo(n.published)}</div>
                   </li>
                 );
               })}
-              {recent.length === 0 && <li><div></div><div style={{color:"var(--muted)"}}>Henüz haber yok.</div><div></div></li>}
+              {recent.length===0 && <li><div></div><div style={{color:"var(--muted)"}}>Henüz haber yok.</div><div></div></li>}
             </ul>
           </div>
-
           <div className="panel-card">
             <h3>Kategori Dağılımı <span className="sub">{news.length} haber</span></h3>
             <div className="cat-bars">
-              {catStats.map(c => (
+              {catStats.map(c=>(
                 <div className="cat-bar" key={c.id}>
-                  <div className="row">
-                    <span><b style={{color:c.color}}>●</b> {c.name}</span>
-                    <span className="n">{c.count}</span>
-                  </div>
-                  <div className="track"><div className="fill" style={{width: c.pct + "%", background: c.color}}></div></div>
+                  <div className="row"><span><b style={{color:c.color}}>●</b> {c.name}</span><span className="n">{c.count}</span></div>
+                  <div className="track"><div className="fill" style={{width:c.pct+"%",background:c.color}}></div></div>
                 </div>
               ))}
             </div>
@@ -722,40 +808,36 @@ function Dashboard({ news, onNav }) {
 }
 
 // --- List ---------------------------------------------------------
-function NewsList({ news, onEdit, onNew, onDelete, onToggleFeatured }) {
-  const [q, setQ] = useState("");
+function NewsList({ news, onEdit, onNew, onDelete, onToggleFeatured, userEmail }) {
+  const [q, setQ]           = useState("");
   const [filter, setFilter] = useState("all");
   const [confirmDel, setConfirmDel] = useState(null);
 
-  const filtered = useMemo(() => {
+  const filtered = useMemo(()=>{
     let list = news;
-    if (filter !== "all") list = list.filter(n => n.category === filter);
-    if (q.trim()) {
-      const s = q.toLowerCase();
-      list = list.filter(n => n.title.toLowerCase().includes(s) || (n.summary||"").toLowerCase().includes(s));
-    }
+    if (filter!=="all") list=list.filter(n=>n.category===filter);
+    if (q.trim()) { const s=q.toLowerCase(); list=list.filter(n=>n.title.toLowerCase().includes(s)||(n.summary||"").toLowerCase().includes(s)); }
     return list;
-  }, [news, q, filter]);
+  },[news,q,filter]);
 
   return (
     <>
-      <Topbar title="Tüm Haberler" crumb={`${filtered.length} / ${news.length}`}
+      <Topbar title="Tüm Haberler" crumb={`${filtered.length} / ${news.length}`} userEmail={userEmail}
         actions={<button className="btn red" onClick={onNew}>+ Yeni Haber</button>} />
       <div className="body-area">
         <div className="toolbar">
           <input type="text" placeholder="Başlık veya özet içinde ara..." value={q} onChange={e=>setQ(e.target.value)} />
           <select value={filter} onChange={e=>setFilter(e.target.value)}>
             <option value="all">Tüm Kategoriler</option>
-            {MISP.CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {MISP.CATEGORIES.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
           <span className="count">{filtered.length} kayıt</span>
         </div>
-
-        {filtered.length === 0 ? (
+        {filtered.length===0 ? (
           <div className="empty">
             <h3>Hiç haber bulunamadı</h3>
-            <p>{news.length === 0 ? "İlk haberinizi ekleyerek başlayın." : "Filtreleri değiştirmeyi deneyin."}</p>
-            {news.length === 0 && <button className="btn red" onClick={onNew}>+ İlk Haberi Ekle</button>}
+            <p>{news.length===0?"İlk haberinizi ekleyerek başlayın.":"Filtreleri değiştirmeyi deneyin."}</p>
+            {news.length===0 && <button className="btn red" onClick={onNew}>+ İlk Haberi Ekle</button>}
           </div>
         ) : (
           <table className="news-table">
@@ -771,33 +853,16 @@ function NewsList({ news, onEdit, onNew, onDelete, onToggleFeatured }) {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(n => {
-                const cat = MISP.categoryById(n.category);
+              {filtered.map(n=>{
+                const cat=MISP.categoryById(n.category);
                 return (
                   <tr key={n.id}>
-                    <td>
-                      <div className="thumb">
-                        {n.image
-                          ? <img src={n.image} alt="" />
-                          : <div className={`ph cat-${n.category}`} style={{width:"100%",height:"100%"}}>{cat.name.slice(0,3)}</div>}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="title">
-                        {n.title}
-                        <span className="ex">{(n.summary||"").slice(0,90)}{(n.summary||"").length>90?"…":""}</span>
-                      </div>
-                    </td>
+                    <td><div className="thumb">{n.image?<img src={n.image} alt=""/>:<div className={`ph cat-${n.category}`} style={{width:"100%",height:"100%"}}>{cat.name.slice(0,3)}</div>}</div></td>
+                    <td><div className="title">{n.title}<span className="ex">{(n.summary||"").slice(0,90)}{(n.summary||"").length>90?"…":""}</span></div></td>
                     <td><span className="pill-cat" style={{background:cat.color}}>{cat.name}</span></td>
-                    <td>{n.author || "—"}</td>
-                    <td style={{fontFamily:"JetBrains Mono, monospace", fontSize:12, color:"var(--muted)"}}>
-                      {MISP.formatDate(n.published)}
-                    </td>
-                    <td>
-                      <button className="pill-star" onClick={()=>onToggleFeatured(n.id)} style={{cursor:"pointer"}}>
-                        {n.featured ? "★ Evet" : "☆ Hayır"}
-                      </button>
-                    </td>
+                    <td>{n.author||"—"}</td>
+                    <td>{MISP.formatDate(n.published)}</td>
+                    <td><button className="pill-star" onClick={()=>onToggleFeatured(n.id)} style={{cursor:"pointer"}}>{n.featured?"★ Evet":"☆ Hayır"}</button></td>
                     <td>
                       <div className="row-actions">
                         <a className="btn sm" href={`haber.html?id=${n.id}`} target="_blank">↗</a>
@@ -812,15 +877,14 @@ function NewsList({ news, onEdit, onNew, onDelete, onToggleFeatured }) {
           </table>
         )}
       </div>
-
       {confirmDel && (
         <div className="modal-bg" onClick={()=>setConfirmDel(null)}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
             <h3>Haberi sil?</h3>
-            <p>"<b>{confirmDel.title}</b>" başlıklı haber kalıcı olarak silinecek. Bu işlem geri alınamaz.</p>
+            <p>"<b>{confirmDel.title}</b>" başlıklı haber kalıcı olarak silinecek.</p>
             <div className="acts">
               <button className="btn" onClick={()=>setConfirmDel(null)}>Vazgeç</button>
-              <button className="btn red" onClick={()=>{ onDelete(confirmDel.id); setConfirmDel(null); }}>Evet, Sil</button>
+              <button className="btn red" onClick={()=>{onDelete(confirmDel.id);setConfirmDel(null);}}>Evet, Sil</button>
             </div>
           </div>
         </div>
@@ -829,101 +893,81 @@ function NewsList({ news, onEdit, onNew, onDelete, onToggleFeatured }) {
   );
 }
 
-// --- Editor -------------------------------------------------------
-function Editor({ editingId, onSaved, onCancel, showToast }) {
-  const existing = editingId ? MISP.byId(editingId) : null;
-  const [form, setForm] = useState(() => existing || {
-    title: "",
-    summary: "",
-    content: "",
-    category: "gundem",
-    author: "MISP Haber Editör",
-    image: "",
-    featured: false,
-  });
-  const [drag, setDrag] = useState(false);
+// --- Editor (async) -----------------------------------------------
+function Editor({ editingId, onSaved, onCancel, showToast, userEmail }) {
+  const DEF = { title:"", summary:"", content:"", category:"gundem", author:"MISP Haber Editör", image:"", featured:false };
+  const [form, setForm]   = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving]   = useState(false);
+  const [drag, setDrag]   = useState(false);
   const fileRef = useRef();
 
-  function set(k, v) { setForm(f => ({...f, [k]: v})); }
+  useEffect(()=>{
+    if (editingId) {
+      MISP.byId(editingId).then(ex=>{ setForm(ex||DEF); setLoading(false); }).catch(()=>{ setForm(DEF); setLoading(false); });
+    } else { setForm(DEF); setLoading(false); }
+  }, [editingId]);
+
+  function set(k,v){ setForm(f=>({...f,[k]:v})); }
 
   function handleFile(file) {
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      showToast("Lütfen bir görsel dosyası seçin.", "warn");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      showToast("Görsel boyutu 5 MB'tan büyük olamaz.", "warn");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (e) => set("image", e.target.result);
-    reader.readAsDataURL(file);
+    if (!file.type.startsWith("image/")) { showToast("Lütfen bir görsel dosyası seçin.","warn"); return; }
+    if (file.size > 5*1024*1024) { showToast("Görsel boyutu 5 MB'tan büyük olamaz.","warn"); return; }
+    const r=new FileReader(); r.onload=e=>set("image",e.target.result); r.readAsDataURL(file);
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
-    if (!form.title.trim()) { showToast("Başlık zorunludur.", "warn"); return; }
-    if (!form.content.trim()) { showToast("Haber içeriği zorunludur.", "warn"); return; }
-
-    if (editingId) {
-      MISP.update(editingId, form);
-      showToast("Haber başarıyla güncellendi.", "ok");
-    } else {
-      MISP.add(form);
-      showToast("Haber yayınlandı! Anasayfada gözükecek.", "ok");
-    }
-    onSaved();
+    if (!form.title.trim())   { showToast("Başlık zorunludur.","warn"); return; }
+    if (!form.content.trim()) { showToast("Haber içeriği zorunludur.","warn"); return; }
+    setSaving(true);
+    try {
+      if (editingId) { await MISP.update(editingId, form); showToast("Haber güncellendi.","ok"); }
+      else           { await MISP.add(form);               showToast("Haber yayınlandı!","ok"); }
+      onSaved();
+    } catch(ex) { showToast("Hata: "+ex.message,"warn"); setSaving(false); }
   }
 
+  if (loading||!form) return <div style={{padding:60,textAlign:"center",color:"var(--muted)",fontSize:14}}>⏳ Yükleniyor...</div>;
   const cat = MISP.categoryById(form.category);
 
   return (
     <>
       <Topbar
-        title={editingId ? "Haberi Düzenle" : "Yeni Haber Ekle"}
-        crumb={editingId ? "Mevcut haber" : "Boş bir form"}
-        actions={
-          <>
-            <button className="btn" onClick={onCancel}>Vazgeç</button>
-            <button className="btn red" onClick={submit}>
-              {editingId ? "Değişiklikleri Kaydet" : "Yayınla"}
-            </button>
-          </>
-        }
+        title={editingId?"Haberi Düzenle":"Yeni Haber Ekle"}
+        crumb={editingId?"Mevcut haber":"Boş form"}
+        userEmail={userEmail}
+        actions={<>
+          <button className="btn" onClick={onCancel}>Vazgeç</button>
+          <button className="btn red" onClick={submit} disabled={saving}>
+            {saving ? "Kaydediliyor..." : (editingId?"Değişiklikleri Kaydet":"Yayınla")}
+          </button>
+        </>}
       />
       <div className="body-area">
         <form onSubmit={submit}>
           <div className="editor-grid">
-
-            {/* SOL: Asıl içerik */}
             <div>
               <div className="ed-card">
                 <div className="ed-head">Haber İçeriği</div>
                 <div className="ed-body">
                   <div className="form-field">
                     <label>Başlık</label>
-                    <input className="title-input" type="text" placeholder="Habere etkileyici bir başlık yazın..."
-                      value={form.title} onChange={e=>set("title", e.target.value)} maxLength={140} />
-                    <div className="hint"><span className="char-count">{form.title.length} / 140</span> Manşette ve listeler de görünecek başlık.</div>
+                    <input className="title-input" type="text" placeholder="Habere etkileyici bir başlık yazın..." value={form.title} onChange={e=>set("title",e.target.value)} maxLength={140} />
+                    <div className="hint"><span className="char-count">{form.title.length} / 140</span> Manşette ve listelerde görünecek başlık.</div>
                   </div>
-
                   <div className="form-field">
                     <label>Özet / Spot</label>
-                    <textarea className="summary-input" placeholder="Haberi 1-2 cümleyle özetleyin. Anasayfada bu yazı görünecek."
-                      value={form.summary} onChange={e=>set("summary", e.target.value)} maxLength={300}></textarea>
+                    <textarea className="summary-input" placeholder="Haberi 1-2 cümleyle özetleyin." value={form.summary} onChange={e=>set("summary",e.target.value)} maxLength={300}></textarea>
                     <div className="hint"><span className="char-count">{form.summary.length} / 300</span></div>
                   </div>
-
                   <div className="form-field">
                     <label>Haber Metni</label>
-                    <textarea placeholder="Haberin tam metnini yazın. Paragrafları boş satırla ayırın."
-                      value={form.content} onChange={e=>set("content", e.target.value)}></textarea>
-                    <div className="hint">Paragrafları boş bir satır bırakarak ayırın. İlk paragraf büyük ilk harfle görüntülenir.</div>
+                    <textarea placeholder="Haberin tam metnini yazın. Paragrafları boş satırla ayırın." value={form.content} onChange={e=>set("content",e.target.value)}></textarea>
                   </div>
                 </div>
               </div>
-
               <div className="ed-card" style={{marginTop:20}}>
                 <div className="ed-head">Görsel</div>
                 <div className="ed-body">
@@ -933,96 +977,75 @@ function Editor({ editingId, onSaved, onCancel, showToast }) {
                       <button type="button" onClick={()=>set("image","")} title="Görseli kaldır">×</button>
                     </div>
                   ) : (
-                    <div
-                      className={`image-upload ${drag ? "drag" : ""}`}
+                    <div className={`image-upload ${drag?"drag":""}`}
                       onClick={()=>fileRef.current.click()}
-                      onDragOver={(e)=>{e.preventDefault();setDrag(true);}}
+                      onDragOver={e=>{e.preventDefault();setDrag(true);}}
                       onDragLeave={()=>setDrag(false)}
-                      onDrop={(e)=>{e.preventDefault();setDrag(false);handleFile(e.dataTransfer.files[0]);}}
-                    >
+                      onDrop={e=>{e.preventDefault();setDrag(false);handleFile(e.dataTransfer.files[0]);}}>
                       <div className="ico">⇪</div>
                       <div className="lbl">Görsel yüklemek için tıklayın veya sürükleyin</div>
                       <div className="sub">JPG, PNG, WebP · Maks. 5 MB</div>
                     </div>
                   )}
                   <input ref={fileRef} type="file" accept="image/*" hidden onChange={e=>handleFile(e.target.files[0])} />
-
                   <div className="form-field" style={{marginTop:14,marginBottom:0}}>
                     <label>Veya görsel URL'si girin</label>
-                    <input type="url" placeholder="https://..." value={form.image && form.image.startsWith("data:") ? "" : form.image}
-                      onChange={e=>set("image", e.target.value)} />
+                    <input type="url" placeholder="https://..." value={form.image&&form.image.startsWith("data:") ? "" : form.image} onChange={e=>set("image",e.target.value)} />
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* SAĞ: Meta */}
             <div>
               <div className="ed-card">
                 <div className="ed-head">Yayın Bilgileri</div>
                 <div className="ed-body">
                   <div className="form-field">
-                    <label>Kategori — haberin görüneceği bölüm</label>
+                    <label>Kategori</label>
                     <div className="cat-picker">
-                      {MISP.CATEGORIES.map(c => (
-                        <button
-                          type="button"
-                          key={c.id}
-                          className={"cat-chip " + (form.category === c.id ? "active" : "")}
-                          style={form.category === c.id ? {background: c.color, borderColor: c.color, color: "#fff"} : {borderColor: c.color, color: c.color}}
-                          onClick={() => set("category", c.id)}
-                        >
-                          {c.name}
-                        </button>
+                      {MISP.CATEGORIES.map(c=>(
+                        <button type="button" key={c.id}
+                          className={"cat-chip "+(form.category===c.id?"active":"")}
+                          style={form.category===c.id?{background:c.color,borderColor:c.color,color:"#fff"}:{borderColor:c.color,color:c.color}}
+                          onClick={()=>set("category",c.id)}>{c.name}</button>
                       ))}
                     </div>
-                    <div className="hint">Bu kategori anasayfanın ilgili bölümünde haberi gösterir.</div>
                   </div>
                   <div className="form-field">
                     <label>Yazar / Servis</label>
-                    <input type="text" value={form.author} onChange={e=>set("author", e.target.value)} placeholder="örn. Türkiye Servisi" />
+                    <input type="text" value={form.author} onChange={e=>set("author",e.target.value)} placeholder="örn. Türkiye Servisi" />
                   </div>
-
                   <div className="toggle-row">
-                    <div className="l">Manşete Çıkar
-                      <span className="h">Anasayfanın üstündeki manşet alanında görünür.</span>
-                    </div>
+                    <div className="l">Manşete Çıkar<span className="h">Anasayfanın üstündeki manşet alanında görünür.</span></div>
                     <label className="switch">
-                      <input type="checkbox" checked={form.featured} onChange={e=>set("featured", e.target.checked)} />
+                      <input type="checkbox" checked={form.featured} onChange={e=>set("featured",e.target.checked)} />
                       <span className="slider"></span>
                     </label>
                   </div>
                 </div>
               </div>
-
-              <div className="ed-card" style={{marginTop:20, background:"#fffbea", borderColor:"#ffe79e"}}>
-                <div className="ed-head" style={{borderColor:"#ffe79e", background:"transparent"}}>ℹ Anasayfada nasıl gözükür?</div>
-                <div className="ed-body" style={{fontSize:13, color:"var(--ink-2)", lineHeight:1.6}}>
+              <div className="ed-card" style={{marginTop:20,background:"#fffbea",borderColor:"#ffe79e"}}>
+                <div className="ed-head" style={{borderColor:"#ffe79e",background:"transparent"}}>ℹ Anasayfada nasıl gözükür?</div>
+                <div className="ed-body" style={{fontSize:13,color:"var(--ink-2)",lineHeight:1.6}}>
                   <p style={{margin:"0 0 8px"}}><b>Manşet alanı:</b> En son eklenen haber büyük olarak en üstte görünür.</p>
-                  <p style={{margin:"0 0 8px"}}><b>Yan haberler (sağ kolon):</b> Manşetten sonraki <b>4 en yeni haber</b> otomatik listelenir. Bir haberin yan tarafta görünmesini istiyorsanız, onu sonradan yayınlayın.</p>
-                  <p style={{margin:0}}><b>Kategori bölümleri:</b> Seçtiğiniz kategori (örn. KKTC) anasayfanın o bölümünde otomatik gösterilir.</p>
+                  <p style={{margin:"0 0 8px"}}><b>Yan haberler:</b> Manşetten sonraki 4 en yeni haber otomatik listelenir.</p>
+                  <p style={{margin:0}}><b>Kategori bölümleri:</b> Seçtiğiniz kategori anasayfanın o bölümünde görünür.</p>
                 </div>
               </div>
-
               <div className="ed-card" style={{marginTop:20}}>
                 <div className="ed-head">Önizleme</div>
                 <div className="ed-body">
                   <div className="preview-card">
                     <span className="tag" style={{color:cat.color}}>{cat.name}</span>
-                    <h4>{form.title || "Haber başlığı burada görünecek"}</h4>
-                    <p>{(form.summary || "Haber özeti burada görünecek. Anasayfada başlığın altında gözükür.").slice(0,140)}</p>
-                    <div className="meta">{form.author || "MISP Haber"} · az önce</div>
-                  </div>
-                  <div style={{fontSize:12,color:"var(--muted)",marginTop:12,lineHeight:1.5}}>
-                    Bu kart anasayfa listelerinde nasıl görüneceğinin yaklaşık bir önizlemesidir.
+                    <h4>{form.title||"Haber başlığı burada görünecek"}</h4>
+                    <p>{(form.summary||"Haber özeti burada görünecek.").slice(0,140)}</p>
+                    <div className="meta">{form.author||"MISP Haber"} · az önce</div>
                   </div>
                 </div>
               </div>
-
               <div className="save-row">
                 <button type="button" className="btn" onClick={onCancel}>Vazgeç</button>
-                <button type="submit" className="btn red" style={{flex:1}}>
-                  {editingId ? "Kaydet" : "Yayınla"}
+                <button type="submit" className="btn red" style={{flex:1}} disabled={saving}>
+                  {saving?"Kaydediliyor...":(editingId?"Kaydet":"Yayınla")}
                 </button>
               </div>
             </div>
@@ -1033,33 +1056,26 @@ function Editor({ editingId, onSaved, onCancel, showToast }) {
   );
 }
 
-// --- Categories view ---------------------------------------------
-function CategoriesView({ news, onNavToList }) {
+// --- Categories view ----------------------------------------------
+function CategoriesView({ news, onNavToList, userEmail }) {
   return (
     <>
-      <Topbar title="Kategoriler" crumb="Site bölümleri" />
+      <Topbar title="Kategoriler" crumb="Site bölümleri" userEmail={userEmail} />
       <div className="body-area">
         <div className="stats" style={{gridTemplateColumns:"repeat(3,1fr)"}}>
-          {MISP.CATEGORIES.map(c => {
-            const items = news.filter(n => n.category === c.id);
+          {MISP.CATEGORIES.map(c=>{
+            const items=news.filter(n=>n.category===c.id);
             return (
               <div className="stat" key={c.id} style={{cursor:"pointer"}} onClick={onNavToList}>
                 <span className="ico" style={{background:c.color,color:"#fff"}}>●</span>
                 <div className="lbl">{c.name}</div>
                 <div className="val">{items.length}</div>
                 <div className="delta" style={{color:c.color}}>
-                  {items[0] ? items[0].title.slice(0,40) + (items[0].title.length>40?"…":"") : "Henüz haber yok"}
+                  {items[0]?items[0].title.slice(0,40)+(items[0].title.length>40?"…":""):"Henüz haber yok"}
                 </div>
               </div>
             );
           })}
-        </div>
-        <div className="panel-card" style={{marginTop:20}}>
-          <h3>Bilgi <span className="sub">read-only</span></h3>
-          <div style={{padding:18,color:"var(--ink-2)",fontSize:14,lineHeight:1.6}}>
-            Kategoriler sistem tarafından tanımlanır ve şu an için sabittir. Bir haberin kategorisini değiştirmek için
-            <b> Tüm Haberler</b> ekranından ilgili habere "Düzenle" deyin.
-          </div>
         </div>
       </div>
     </>
@@ -1067,28 +1083,19 @@ function CategoriesView({ news, onNavToList }) {
 }
 
 // --- Settings view -----------------------------------------------
-function SettingsView({ onReset }) {
+function SettingsView({ onReset, userEmail }) {
   const [confirm, setConfirm] = useState(false);
   return (
     <>
-      <Topbar title="Ayarlar" crumb="Sistem" />
+      <Topbar title="Ayarlar" crumb="Sistem" userEmail={userEmail} />
       <div className="body-area">
         <div className="panel-card">
           <h3>Site Bilgileri</h3>
           <div style={{padding:18}}>
-            <div className="form-field"><label>Site Adı</label>
-              <input type="text" defaultValue="MISP Haber" disabled />
-            </div>
-            <div className="form-field"><label>İletişim E-posta</label>
-              <input type="text" defaultValue="editor@misphaber.com" disabled />
-            </div>
-            <div className="form-field"><label>Veri Depolama</label>
-              <input type="text" defaultValue="Tarayıcı (localStorage) · misp_haber_news_v1" disabled />
-              <div className="hint">Tüm haberler tarayıcınızın yerel depolama alanında tutulur. Yüklediğiniz her haber anasayfada anında görünür.</div>
-            </div>
+            <div className="form-field"><label>Site Adı</label><input type="text" defaultValue="MISP Haber" disabled /></div>
+            <div className="form-field"><label>Veri Depolama</label><input type="text" defaultValue="Firebase Firestore · misphaber" disabled /><div className="hint">Tüm haberler Firebase Firestore'da saklanır ve tüm cihazlarda anlık güncellenir.</div></div>
           </div>
         </div>
-
         <div className="panel-card" style={{marginTop:20,borderColor:"#f3c8ce"}}>
           <h3 style={{color:"var(--brand)"}}>Tehlikeli Bölge</h3>
           <div style={{padding:18}}>
@@ -1097,7 +1104,6 @@ function SettingsView({ onReset }) {
           </div>
         </div>
       </div>
-
       {confirm && (
         <div className="modal-bg" onClick={()=>setConfirm(false)}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
@@ -1105,7 +1111,7 @@ function SettingsView({ onReset }) {
             <p>Tüm mevcut haberler silinecek ve varsayılan örnek haberler yüklenecek.</p>
             <div className="acts">
               <button className="btn" onClick={()=>setConfirm(false)}>Vazgeç</button>
-              <button className="btn red" onClick={()=>{ onReset(); setConfirm(false); }}>Evet, Sıfırla</button>
+              <button className="btn red" onClick={()=>{onReset();setConfirm(false);}}>Evet, Sıfırla</button>
             </div>
           </div>
         </div>
@@ -1114,79 +1120,71 @@ function SettingsView({ onReset }) {
   );
 }
 
-// --- App shell ----------------------------------------------------
+// --- App shell (Firebase Auth) ------------------------------------
 function App() {
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem(AUTH_KEY) === "1");
-  const [view, setView] = useState("dashboard");
-  const [editingId, setEditingId] = useState(null);
-  const [news, setNews] = useState(() => MISP.all());
-  const [toast, setToast] = useState(null);
+  const [authed,   setAuthed]   = useState(null); // null=yükleniyor
+  const [userEmail,setUserEmail]= useState("");
+  const [view,     setView]     = useState("dashboard");
+  const [editingId,setEditingId]= useState(null);
+  const [news,     setNews]     = useState([]);
+  const [toast,    setToast]    = useState(null);
 
-  function refresh() { setNews(MISP.all()); }
+  // Firebase Auth durumu dinle
+  useEffect(()=>{
+    return MISP.onAuthChange(user=>{
+      setAuthed(!!user);
+      setUserEmail(user?user.email:"");
+    });
+  },[]);
 
-  useEffect(() => {
-    const h = () => refresh();
-    window.addEventListener("misp:news-updated", h);
-    return () => window.removeEventListener("misp:news-updated", h);
-  }, []);
+  // Giriş yapıldıktan sonra Firestore'u gerçek zamanlı dinle
+  useEffect(()=>{
+    if (!authed) return;
+    return MISP.subscribe(list=>setNews(list));
+  },[authed]);
 
-  function showToast(msg, kind = "ok") {
-    setToast({ msg, kind, id: Date.now() });
-    setTimeout(() => setToast(t => (t && t.msg === msg ? null : t)), 3200);
+  function showToast(msg, kind="ok") {
+    setToast({msg,kind,id:Date.now()});
+    setTimeout(()=>setToast(t=>(t&&t.msg===msg?null:t)),3200);
   }
 
-  function nav(v) {
-    if (v === "new") { setEditingId(null); setView("editor"); }
-    else { setView(v); }
+  function nav(v){ if(v==="new"){setEditingId(null);setView("editor");}else{setView(v);} }
+  function startEdit(id){ setEditingId(id); setView("editor"); }
+
+  async function del(id){ await MISP.remove(id); showToast("Haber silindi.","warn"); }
+  async function toggleFeatured(id){
+    const n=news.find(x=>x.id===id);
+    if(n) await MISP.update(id,{featured:!n.featured});
   }
+  async function reset(){ await MISP.resetSeed(); showToast("Veriler sıfırlandı.","ok"); }
+  async function logout(){ await MISP.logout(); }
 
-  function startEdit(id) { setEditingId(id); setView("editor"); }
+  // Auth yüklenirken bekleme ekranı
+  if (authed===null) return (
+    <div style={{minHeight:"100vh",display:"grid",placeItems:"center",background:"#0e1014",color:"#fff",fontFamily:"'JetBrains Mono',monospace"}}>
+      <div style={{textAlign:"center"}}>
+        <div style={{fontFamily:"'Playfair Display',serif",fontSize:42,fontWeight:900,marginBottom:16}}>
+          <span style={{color:"#c8102e"}}>M</span>ISP<span style={{color:"#c8102e"}}>.</span>
+        </div>
+        <div style={{color:"#8a909a",fontSize:13}}>Bağlanıyor...</div>
+      </div>
+    </div>
+  );
 
-  function del(id) {
-    MISP.remove(id);
-    refresh();
-    showToast("Haber silindi.", "warn");
-  }
+  if (!authed) return <Login />;
 
-  function toggleFeatured(id) {
-    const n = MISP.byId(id);
-    MISP.update(id, { featured: !n.featured });
-    refresh();
-  }
-
-  function reset() {
-    MISP.resetSeed();
-    refresh();
-    showToast("Veriler varsayılana sıfırlandı.", "ok");
-  }
-
-  function logout() {
-    sessionStorage.removeItem(AUTH_KEY);
-    setAuthed(false);
-  }
-
-  if (!authed) return <Login onLogin={() => setAuthed(true)} />;
-
-  const stats = { total: news.length, categories: MISP.CATEGORIES.length };
-
-  let activeNav = view === "editor" ? (editingId ? "list" : "new") : view;
+  const stats = { total:news.length, categories:MISP.CATEGORIES.length };
+  const activeNav = view==="editor" ? (editingId?"list":"new") : view;
 
   return (
     <div className="app">
-      <Sidebar active={activeNav} onNav={nav} stats={stats} onLogout={logout} />
+      <Sidebar active={activeNav} onNav={nav} stats={stats} onLogout={logout} userEmail={userEmail} />
       <main className="content">
-        {view === "dashboard" && <Dashboard news={news} onNav={nav} />}
-        {view === "list" && (
-          <NewsList news={news} onEdit={startEdit} onNew={()=>nav("new")}
-            onDelete={del} onToggleFeatured={toggleFeatured} />
-        )}
-        {view === "editor" && (
-          <Editor editingId={editingId} showToast={showToast}
-            onSaved={() => { setView("list"); setEditingId(null); refresh(); }}
-            onCancel={() => { setView(editingId ? "list" : "dashboard"); setEditingId(null); }} />
-        )}
-        {view === "categories" && <CategoriesView news={news} onNavToList={()=>nav("list")} />}
-        {view === "settings" && <SettingsView onReset={reset} />}
+        {view==="dashboard"  && <Dashboard  news={news} onNav={nav} userEmail={userEmail} />}
+        {view==="list"       && <NewsList   news={news} onEdit={startEdit} onNew={()=>nav("new")} onDelete={del} onToggleFeatured={toggleFeatured} userEmail={userEmail} />}
+        {view==="editor"     && <Editor     editingId={editingId} showToast={showToast} onSaved={()=>{setView("list");setEditingId(null);}} onCancel={()=>{setView(editingId?"list":"dashboard");setEditingId(null);}} userEmail={userEmail} />}
+        {view==="categories" && <CategoriesView news={news} onNavToList={()=>nav("list")} userEmail={userEmail} />}
+        {view==="settings"   && <SettingsView onReset={reset} userEmail={userEmail} />}
       </main>
       {toast && <div className={`toast ${toast.kind}`} key={toast.id}>{toast.msg}</div>}
     </div>
@@ -1194,7 +1192,6 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-
 </script>
 </body>
 </html>
