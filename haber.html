@@ -365,13 +365,13 @@
     // İlgili haberler (aynı kategori, farklı haber)
     _db.collection("news")
       .where("category", "==", n.category)
-      .orderBy("published", "desc")
-      .limit(6)
+      .limit(8)
       .get()
       .then(snap => {
         const related = snap.docs
           .map(d => ({ id: d.id, ...d.data() }))
           .filter(x => x.id !== n.id)
+          .sort((a, b) => b.published - a.published)
           .slice(0, 3);
 
         if (related.length === 0) {
