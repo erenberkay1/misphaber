@@ -6,322 +6,374 @@
 <title>Haber — MISP Haber</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --brand: #c8102e;
-    --ink: #16181d;
-    --ink-2: #3a3f47;
-    --muted: #6b727c;
-    --line: #e4e6ea;
-    --bg: #fff;
-    --bg-tint: #f6f7f9;
+    --brand:#c8102e; --brand-dark:#8a0a1f;
+    --ink:#16181d; --ink-2:#3a3f47; --muted:#6b727c;
+    --line:#e4e6ea; --line-2:#f0f1f3;
+    --bg:#ffffff; --bg-tint:#f6f7f9;
   }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: "Source Sans 3", sans-serif; color: var(--ink); background: #fff; }
-  a { color: inherit; text-decoration: none; }
-  a:hover { color: var(--brand); }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{font-family:"Source Sans 3",system-ui,sans-serif;color:var(--ink);background:var(--bg);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none;} a:hover{color:var(--brand);}
+  img{display:block;max-width:100%;}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 20px;}
 
-  /* compact header */
-  .top {
-    border-bottom: 1px solid var(--line);
-    background: #fff;
-    position: sticky; top: 0; z-index: 10;
-  }
-  .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 62px; }
-  .logo { font-family: "Playfair Display", serif; font-weight: 900; font-size: 28px; letter-spacing: -.02em; }
-  .logo .m { color: var(--brand); }
-  .top nav { display: flex; gap: 18px; font-size: 13px; font-weight: 600; }
-  .top .back { color: var(--brand); font-weight: 700; }
+  /* TOP STRIP */
+  .topstrip{background:#0e1014;color:#d9dde4;font-size:12.5px;border-bottom:1px solid #1d2027;}
+  .topstrip .wrap{display:flex;align-items:center;justify-content:space-between;height:34px;}
+  .topstrip .social{display:flex;gap:14px;}
+  .topstrip .social a{color:#aab0b9;font-size:13px;}
+  .topstrip .social a:hover{color:#fff;}
 
-  /* article */
-  article { padding: 48px 0 24px; }
-  .cat-tag {
-    display: inline-block;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    font-size: 12px;
-    margin-bottom: 18px;
-  }
-  h1.headline {
-    font-family: "Playfair Display", serif;
-    font-weight: 900;
-    font-size: 48px;
-    line-height: 1.1;
-    margin: 0 0 18px;
-    text-wrap: balance;
-    max-width: 900px;
-  }
-  .dek {
-    font-family: "Source Serif 4", serif;
-    font-size: 21px;
-    color: var(--ink-2);
-    line-height: 1.45;
-    margin: 0 0 26px;
-    max-width: 800px;
-    font-weight: 400;
-  }
-  .byline {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 16px;
-    padding: 16px 0;
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-    margin-bottom: 30px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .byline b { color: var(--ink); }
-  .byline .avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--brand); color: #fff;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-family: "Playfair Display", serif; font-weight: 900; font-size: 16px;
-  }
-  .byline .share { margin-left: auto; display: flex; gap: 6px; }
-  .byline .share a {
-    width: 32px; height: 32px;
-    display: inline-flex; align-items: center; justify-content: center;
-    border: 1px solid var(--line); border-radius: 50%;
-    font-size: 13px; color: var(--ink-2);
-  }
-  .byline .share a:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+  /* MASTHEAD */
+  .masthead{border-bottom:1px solid var(--line);}
+  .masthead .wrap{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;}
+  .logo{font-family:"Playfair Display",serif;font-weight:900;font-size:38px;letter-spacing:-.02em;line-height:1;color:var(--ink);display:flex;align-items:baseline;gap:6px;}
+  .logo .m{color:var(--brand);}
+  .logo .sub{font-family:"Source Sans 3",sans-serif;font-weight:600;font-size:10px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;margin-left:4px;transform:translateY(-5px);}
 
-  .hero-img {
-    aspect-ratio: 16/9;
-    margin-bottom: 12px;
-    background: #111;
-    overflow: hidden;
-  }
-  .hero-img img { width: 100%; height: 100%; object-fit: cover; }
-  .caption {
-    font-size: 13px;
-    color: var(--muted);
-    border-left: 3px solid var(--brand);
-    padding-left: 10px;
-    margin: 0 0 30px;
-  }
+  /* NAV */
+  .nav{border-bottom:2px solid var(--brand);background:#fff;position:sticky;top:0;z-index:10;}
+  .nav .wrap{display:flex;align-items:center;overflow-x:auto;}
+  .nav a{padding:12px 16px;font-weight:600;font-size:13.5px;white-space:nowrap;color:var(--ink-2);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s;}
+  .nav a:hover,.nav a.active{color:var(--brand);border-bottom-color:var(--brand);}
 
-  .body-grid {
-    display: grid;
-    grid-template-columns: minmax(0,720px) 280px;
-    gap: 60px;
-    align-items: start;
-  }
-  .body p {
-    font-family: "Source Serif 4", serif;
-    font-size: 18.5px;
-    line-height: 1.7;
-    margin: 0 0 22px;
-    color: #1f2229;
-  }
-  .body p:first-child::first-letter {
-    font-family: "Playfair Display", serif;
-    font-weight: 900;
-    font-size: 64px;
-    float: left;
-    line-height: .9;
-    padding: 6px 10px 0 0;
-    color: var(--brand);
-  }
-  .pullquote {
-    font-family: "Playfair Display", serif;
-    font-weight: 700;
-    font-size: 26px;
-    line-height: 1.3;
-    margin: 30px 0;
-    padding: 24px 0;
-    border-top: 2px solid var(--ink);
-    border-bottom: 2px solid var(--ink);
-    text-wrap: balance;
-  }
+  /* ARTICLE */
+  .article-wrap{max-width:760px;margin:0 auto;padding:0 20px 60px;}
+  .breadcrumb{padding:16px 0 0;font-size:12.5px;color:var(--muted);font-family:"JetBrains Mono",monospace;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .breadcrumb a:hover{color:var(--brand);}
+  .article-header{padding:24px 0 22px;border-bottom:1px solid var(--line);margin-bottom:28px;}
+  .cat-badge{display:inline-block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;padding:4px 10px;border-radius:2px;color:#fff;margin-bottom:14px;}
+  .article-title{font-family:"Playfair Display",serif;font-weight:900;font-size:clamp(26px,4vw,40px);line-height:1.15;letter-spacing:-.02em;margin:0 0 16px;color:var(--ink);}
+  .article-summary{font-size:18px;color:var(--ink-2);line-height:1.55;margin:0 0 20px;font-weight:500;}
+  .article-meta{display:flex;align-items:center;gap:14px;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);flex-wrap:wrap;}
+  .article-meta .author{color:var(--ink);font-weight:600;}
+  .article-image{width:100%;aspect-ratio:16/9;background:var(--bg-tint);border-radius:4px;overflow:hidden;margin-bottom:32px;}
+  .article-image img{width:100%;height:100%;object-fit:cover;}
+  .ph-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace;font-size:12px;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.1em;}
+  .article-body{font-size:17px;line-height:1.8;color:var(--ink-2);}
+  .article-body p{margin:0 0 22px;}
+  .article-body p:first-child::first-letter{font-family:"Playfair Display",serif;font-size:3.8em;font-weight:900;float:left;line-height:.8;margin:6px 10px 0 0;color:var(--brand);}
 
-  .ph {
-    background:
-      repeating-linear-gradient(45deg, rgba(0,0,0,.06) 0 12px, transparent 12px 24px),
-      linear-gradient(135deg, var(--c1, #c8102e), var(--c2, #8a0a1f));
-    display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,.9);
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px; letter-spacing: .15em; text-transform: uppercase;
-  }
-  .ph.cat-gundem    { --c1:#c8102e;--c2:#8a0a1f }
-  .ph.cat-politika  { --c1:#1f4b8a;--c2:#0e2a52 }
-  .ph.cat-dunya     { --c1:#2a6fdb;--c2:#1a4791 }
-  .ph.cat-ekonomi   { --c1:#0b7a3b;--c2:#044a23 }
-  .ph.cat-spor      { --c1:#d35400;--c2:#8a3700 }
-  .ph.cat-magazin   { --c1:#a33089;--c2:#6a1c58 }
-  .ph.cat-saglik    { --c1:#0d8c8c;--c2:#075959 }
-  .ph.cat-teknoloji { --c1:#5a3da6;--c2:#382562 }
-  .ph.cat-kultur    { --c1:#7a5c2e;--c2:#4a371b }
+  /* FOOT */
+  .article-foot{margin-top:40px;padding-top:24px;border-top:2px solid var(--brand);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .back-btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border:1.5px solid var(--line);border-radius:999px;font-weight:600;font-size:13px;color:var(--ink);background:#fff;cursor:pointer;transition:all .15s;}
+  .back-btn:hover{border-color:var(--brand);color:var(--brand);}
+  .share-row{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);}
+  .share-btn{height:34px;padding:0 14px;border:1.5px solid var(--line);border-radius:999px;font-size:12px;font-weight:700;color:var(--ink);background:#fff;cursor:pointer;transition:all .15s;}
+  .share-btn:hover{border-color:var(--ink);background:var(--ink);color:#fff;}
 
-  aside.rail { position: sticky; top: 82px; }
-  .rail-card { border: 1px solid var(--line); padding: 18px; margin-bottom: 22px; }
-  .rail-card h4 {
-    margin: 0 0 12px;
-    font-family: "Playfair Display", serif;
-    font-weight: 900;
-    font-size: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--line);
-  }
-  .rail-card ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
-  .rail-card li { font-size: 14px; line-height: 1.35; cursor: pointer; padding-bottom: 10px; border-bottom: 1px dashed var(--line); }
-  .rail-card li:last-child { border: none; padding: 0; }
-  .rail-card li .t { display: block; font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: var(--muted); margin-top: 4px; }
+  /* RELATED */
+  .related-section{background:var(--bg-tint);border-top:1px solid var(--line);padding:40px 0;margin-top:0;}
+  .related-title{font-family:"Playfair Display",serif;font-weight:900;font-size:20px;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--brand);display:inline-block;}
+  .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .related-card{background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden;transition:box-shadow .15s;}
+  .related-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);}
+  .related-card .thumb{aspect-ratio:16/9;background:var(--bg-tint);overflow:hidden;}
+  .related-card .thumb img{width:100%;height:100%;object-fit:cover;}
+  .related-card .rbody{padding:14px;}
+  .related-card .rcat{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:block;}
+  .related-card h4{font-family:"Playfair Display",serif;font-weight:800;font-size:15px;margin:0 0 6px;line-height:1.25;}
+  .related-card .rt{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);}
 
-  .related { padding: 40px 0 60px; border-top: 1px solid var(--line); }
-  .related h2 {
-    font-family: "Playfair Display", serif;
-    font-weight: 900;
-    font-size: 24px;
-    margin: 0 0 22px;
-  }
-  .related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .rel-card { cursor: pointer; }
-  .rel-card .thumb { aspect-ratio: 4/3; margin-bottom: 10px; overflow: hidden; }
-  .rel-card h4 { font-family: "Playfair Display", serif; font-weight: 700; font-size: 15px; line-height: 1.25; margin: 0; }
-  .rel-card .t { font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: var(--muted); margin-top: 6px; display: block; }
+  /* STATE SCREENS */
+  .state-screen{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);padding:40px;}
+  .state-screen h2{font-family:"Playfair Display",serif;font-size:32px;margin:0 0 10px;color:var(--ink);}
+  .state-screen p{font-size:15px;margin:0 0 24px;}
+  .btn-red{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 24px;background:var(--brand);color:#fff;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.1em;border-radius:3px;border:none;cursor:pointer;text-decoration:none;}
+  .btn-red:hover{background:var(--brand-dark);color:#fff;}
 
-  footer { background: #0e1014; color: #c5c9d1; padding: 30px 0; text-align: center; font-size: 13px; }
-  footer .logo { color: #fff; font-size: 20px; margin-bottom: 6px; }
+  /* PH colors */
+  .ph-gundem{background:linear-gradient(135deg,#c8102e,#8a0a1f);}
+  .ph-turkiye{background:linear-gradient(135deg,#1f4b8a,#0e2a52);}
+  .ph-kktc{background:linear-gradient(135deg,#0b7a3b,#044a23);}
+  .ph-dunya{background:linear-gradient(135deg,#2a6fdb,#1a4791);}
+  .ph-ekonomi{background:linear-gradient(135deg,#a33089,#6a1c58);}
 
-  .notfound { padding: 100px 0; text-align: center; }
-  .notfound h1 { font-family: "Playfair Display", serif; font-size: 48px; margin: 0 0 10px; }
-  .notfound p { color: var(--muted); margin: 0 0 24px; }
-  .notfound a { background: var(--brand); color: #fff; padding: 10px 20px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; font-size: 13px; }
+  /* FOOTER */
+  footer{background:#0e1014;color:#8a909a;padding:28px 0;}
+  footer .wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;}
+  footer .logo-f{font-family:"Playfair Display",serif;font-weight:900;font-size:22px;color:#fff;}
+  footer .logo-f .m{color:var(--brand);}
 
-  @media (max-width: 900px) {
-    .body-grid { grid-template-columns: 1fr; }
-    h1.headline { font-size: 32px; }
-    .related-grid { grid-template-columns: 1fr 1fr; }
+  @media(max-width:700px){
+    .related-grid{grid-template-columns:1fr;}
+    .logo{font-size:28px;}
+    .article-title{font-size:24px;}
+    .article-summary{font-size:16px;}
+    .article-body{font-size:15px;}
   }
 </style>
 </head>
 <body>
 
-<header class="top">
+<!-- TOP STRIP -->
+<div class="topstrip">
   <div class="wrap">
-    <a class="logo" href="index.html"><span class="m">M</span>ISP<span style="color:var(--brand)">.</span>Haber</a>
-    <nav>
-      <a href="index.html" class="back">← Anasayfa</a>
-    </nav>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8a909a;letter-spacing:.08em;">MISP HABER · GÜVENİLİR HABERCİLİK</div>
+    <div class="social">
+      <a href="#" title="Twitter">𝕏</a>
+      <a href="#" title="Instagram">◉</a>
+      <a href="#" title="YouTube">▶</a>
+      <a href="#" title="Facebook">f</a>
+    </div>
+  </div>
+</div>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="wrap">
+    <a href="index.html" class="logo">
+      <span class="m">M</span>ISP<span style="color:var(--brand)">.</span>Haber
+      <span class="sub">— MİLLETİN İRADESİ</span>
+    </a>
   </div>
 </header>
 
-<main id="main"></main>
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap" id="navWrap">
+    <a href="index.html">Anasayfa</a>
+  </div>
+</nav>
 
+<!-- MAIN CONTENT -->
+<div id="app">
+  <!-- Loading state -->
+  <div class="state-screen" id="stateLoading">
+    <div style="font-size:36px;margin-bottom:16px;animation:spin 1s linear infinite;display:inline-block">⏳</div>
+    <h2>Yükleniyor</h2>
+    <p>Haber getiriliyor...</p>
+  </div>
+  <!-- Error state (hidden) -->
+  <div class="state-screen" id="stateError" style="display:none">
+    <div style="font-size:48px;margin-bottom:16px">📭</div>
+    <h2>Haber bulunamadı</h2>
+    <p>Aradığınız haber kaldırılmış veya hiç var olmamış olabilir.</p>
+    <a href="index.html" class="btn-red">Anasayfaya Dön</a>
+  </div>
+  <!-- Article (hidden until loaded) -->
+  <div id="stateArticle" style="display:none">
+    <div class="article-wrap">
+      <div class="breadcrumb">
+        <a href="index.html">Anasayfa</a>
+        <span>›</span>
+        <span id="bcCat"></span>
+        <span>›</span>
+        <span id="bcTitle" style="color:var(--ink);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle;"></span>
+      </div>
+      <div class="article-header">
+        <div id="catBadge" class="cat-badge"></div>
+        <h1 class="article-title" id="artTitle"></h1>
+        <p class="article-summary" id="artSummary"></p>
+        <div class="article-meta">
+          <span class="author" id="artAuthor"></span>
+          <span>·</span>
+          <span id="artDate"></span>
+          <span>·</span>
+          <span id="artTimeAgo"></span>
+        </div>
+      </div>
+      <div class="article-image" id="artImageWrap"></div>
+      <div class="article-body" id="artBody"></div>
+      <div class="article-foot">
+        <a href="index.html" class="back-btn">← Anasayfaya Dön</a>
+        <div class="share-row">
+          <span>Paylaş:</span>
+          <button class="share-btn" onclick="shareTwitter()">𝕏 Twitter</button>
+          <button class="share-btn" onclick="shareWhatsApp()">WhatsApp</button>
+          <button class="share-btn" onclick="copyLink()">🔗 Linki Kopyala</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATED -->
+    <div class="related-section">
+      <div class="wrap">
+        <div class="related-title">İlgili Haberler</div>
+        <div class="related-grid" id="relatedGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
 <footer>
-  <div class="logo"><span style="color:var(--brand)">M</span>ISP<span style="color:var(--brand)">.</span>Haber</div>
-  © 2026 MISP Haber · Bağımsız habercilik için.
+  <div class="wrap">
+    <div class="logo-f"><span class="m">M</span>ISP Haber</div>
+    <div>© 2026 MISP Haber · Bağımsız habercilik için.</div>
+  </div>
 </footer>
 
-<script src="data.js"></script>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
+(function () {
+  const _cfg = {
+    apiKey: "AIzaSyCdB1E_QPW9hUkerftOks1XfUeY6lXGlZ0",
+    authDomain: "misphaber.firebaseapp.com",
+    projectId: "misphaber",
+    storageBucket: "misphaber.firebasestorage.app",
+    messagingSenderId: "165920201061",
+    appId: "1:165920201061:web:59e313f53931d76458a98c"
+  };
+  firebase.initializeApp(_cfg);
+  const _db = firebase.firestore();
+
+  const CATEGORIES = [
+    { id:"gundem",  name:"Gündem",  color:"#c8102e" },
+    { id:"turkiye", name:"Türkiye", color:"#1f4b8a" },
+    { id:"kktc",    name:"KKTC",    color:"#0b7a3b" },
+    { id:"dunya",   name:"Dünya",   color:"#2a6fdb" },
+    { id:"ekonomi", name:"Ekonomi", color:"#a33089" },
+  ];
+
+  function categoryById(id) {
+    return CATEGORIES.find(c => c.id === id) || { name: id, color: "#444" };
+  }
+
+  function timeAgo(ts) {
+    const diff = Date.now() - ts, m = Math.floor(diff / 60000);
+    if (m < 1)  return "az önce";
+    if (m < 60) return m + " dakika önce";
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + " saat önce";
+    const d = Math.floor(h / 24);
+    if (d < 7)  return d + " gün önce";
+    return new Date(ts).toLocaleDateString("tr-TR");
+  }
+
+  function formatDate(ts) {
+    return new Date(ts).toLocaleString("tr-TR", {
+      day:"2-digit", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit"
+    });
+  }
+
+  // NAV kategorileri
+  CATEGORIES.forEach(c => {
+    const a = document.createElement("a");
+    a.textContent = c.name; a.href = "index.html#cat-" + c.id;
+    document.getElementById("navWrap").appendChild(a);
+  });
+
+  // URL'den id al
   const params = new URLSearchParams(location.search);
-  const id = params.get("id");
-  const main = document.getElementById("main");
+  const newsId = params.get("id");
 
-  function thumbHTML(n) {
-    if (n.image) return `<img src="${n.image}" alt="" />`;
-    return `<div class="ph cat-${n.category}" style="width:100%;height:100%">${MISP.categoryById(n.category).name} · görsel</div>`;
+  function showError() {
+    document.getElementById("stateLoading").style.display = "none";
+    document.getElementById("stateError").style.display   = "flex";
+    document.getElementById("stateArticle").style.display = "none";
   }
 
-  function render() {
-    const n = id ? MISP.byId(id) : null;
-    if (!n) {
-      main.innerHTML = `
-        <div class="notfound">
-          <h1>Haber bulunamadı</h1>
-          <p>Aradığınız haber kaldırılmış veya hiç var olmamış olabilir.</p>
-          <a href="index.html">Anasayfaya dön</a>
-        </div>`;
-      return;
-    }
-    const cat = MISP.categoryById(n.category);
-    const paragraphs = (n.content || n.summary || "").split(/\n+/).filter(Boolean);
+  function showArticle() {
+    document.getElementById("stateLoading").style.display  = "none";
+    document.getElementById("stateError").style.display    = "none";
+    document.getElementById("stateArticle").style.display  = "block";
+  }
 
-    // pullquote: 2. paragraf'tan kısa bir cümle
-    let pullquote = "";
-    if (paragraphs.length > 1) {
-      const sentences = paragraphs[1].split(/\.\s+/).map(s => s.trim()).filter(s => s.length > 30 && s.length < 160);
-      if (sentences[0]) pullquote = sentences[0].replace(/[.,;:]+$/,"") + ".";
-    }
+  if (!newsId) { showError(); return; }
 
-    const related = MISP.byCategory(n.category).filter(x => x.id !== n.id).slice(0, 4);
-    const more = MISP.all().filter(x => x.id !== n.id && x.category !== n.category).slice(0, 4);
-    const trending = MISP.all().filter(x => x.id !== n.id).slice(0, 5);
+  // Firestore'dan haberi çek
+  _db.collection("news").doc(newsId).get().then(doc => {
+    if (!doc.exists) { showError(); return; }
 
-    main.innerHTML = `
-      <article class="wrap">
-        <span class="cat-tag" style="color:${cat.color}">${cat.name}</span>
-        <h1 class="headline">${n.title}</h1>
-        <p class="dek">${n.summary || ""}</p>
+    const n = { id: doc.id, ...doc.data() };
+    const cat = categoryById(n.category);
 
-        <div class="byline">
-          <div class="avatar">${(n.author || "M")[0].toUpperCase()}</div>
-          <div>
-            <div><b>${n.author || "MISP Haber"}</b></div>
-            <div style="font-size:12px">${MISP.formatDate(n.published)} · Güncellendi: ${MISP.timeAgo(n.published)}</div>
-          </div>
-          <div class="share">
-            <a href="#" title="X">𝕏</a>
-            <a href="#" title="Facebook">f</a>
-            <a href="#" title="WhatsApp">✆</a>
-            <a href="#" title="Bağlantıyı kopyala" onclick="navigator.clipboard.writeText(location.href);this.textContent='✓';setTimeout(()=>this.textContent='⎘',1500);return false;">⎘</a>
-          </div>
-        </div>
-
-        <div class="hero-img">${thumbHTML(n)}</div>
-        <p class="caption">${cat.name} · ${n.title.slice(0,80)}${n.title.length>80?"…":""}</p>
-
-        <div class="body-grid">
-          <div class="body">
-            ${paragraphs.slice(0, Math.ceil(paragraphs.length/2)).map(p => `<p>${p}</p>`).join("")}
-            ${pullquote ? `<div class="pullquote">"${pullquote}"</div>` : ""}
-            ${paragraphs.slice(Math.ceil(paragraphs.length/2)).map(p => `<p>${p}</p>`).join("")}
-            <p style="font-style:italic;color:var(--muted);font-size:15px;border-top:1px solid var(--line);padding-top:18px;margin-top:30px">Bu haber MISP Haber editör ekibi tarafından yayına hazırlanmıştır. Görüş ve önerileriniz için editor@misphaber.com adresine yazabilirsiniz.</p>
-          </div>
-          <aside class="rail">
-            <div class="rail-card">
-              <h4>İlgili Haberler</h4>
-              <ul>
-                ${related.length ? related.map(r => `
-                  <li onclick="location.href='haber.html?id=${r.id}'">${r.title}<span class="t">${MISP.timeAgo(r.published)}</span></li>
-                `).join("") : `<li style="color:var(--muted);font-style:italic">Bu kategoride başka haber bulunmuyor.</li>`}
-              </ul>
-            </div>
-            <div class="rail-card">
-              <h4>Şu An Trend</h4>
-              <ul>
-                ${trending.map((t, i) => `
-                  <li onclick="location.href='haber.html?id=${t.id}'"><b style="color:${MISP.categoryById(t.category).color};font-family:'Playfair Display',serif;margin-right:6px">${i+1}.</b>${t.title}</li>
-                `).join("")}
-              </ul>
-            </div>
-          </aside>
-        </div>
-      </article>
-
-      <section class="wrap related">
-        <h2>Daha Fazla Haber</h2>
-        <div class="related-grid">
-          ${[...related, ...more].slice(0,4).map(r => `
-            <a class="rel-card" href="haber.html?id=${r.id}">
-              <div class="thumb">${thumbHTML(r)}</div>
-              <h4>${r.title}</h4>
-              <span class="t">${MISP.categoryById(r.category).name.toUpperCase()} · ${MISP.timeAgo(r.published)}</span>
-            </a>
-          `).join("")}
-        </div>
-      </section>
-    `;
+    // Başlık güncelle
     document.title = n.title + " — MISP Haber";
-  }
 
-  render();
-  window.addEventListener("misp:news-updated", render);
+    // Breadcrumb
+    document.getElementById("bcCat").textContent   = cat.name;
+    document.getElementById("bcTitle").textContent = n.title;
+
+    // Kategori badge
+    const badge = document.getElementById("catBadge");
+    badge.textContent = cat.name;
+    badge.style.background = cat.color;
+
+    // Başlık, özet, meta
+    document.getElementById("artTitle").textContent   = n.title;
+    document.getElementById("artSummary").textContent = n.summary || "";
+    document.getElementById("artAuthor").textContent  = n.author  || "MISP Haber";
+    document.getElementById("artDate").textContent    = formatDate(n.published);
+    document.getElementById("artTimeAgo").textContent = timeAgo(n.published);
+
+    // Görsel
+    const imgWrap = document.getElementById("artImageWrap");
+    if (n.image) {
+      imgWrap.innerHTML = `<img src="${n.image}" alt="${n.title}" />`;
+    } else {
+      imgWrap.innerHTML = `<div class="ph-img ph-${n.category}">${cat.name} · Görsel</div>`;
+    }
+
+    // İçerik (paragraflar)
+    const body = document.getElementById("artBody");
+    const paragraphs = (n.content || "").split(/\n\n+/).filter(p => p.trim());
+    body.innerHTML = paragraphs.map(p => `<p>${p.trim().replace(/\n/g, "<br>")}</p>`).join("");
+
+    showArticle();
+
+    // İlgili haberler (aynı kategori, farklı haber)
+    _db.collection("news")
+      .where("category", "==", n.category)
+      .orderBy("published", "desc")
+      .limit(6)
+      .get()
+      .then(snap => {
+        const related = snap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .filter(x => x.id !== n.id)
+          .slice(0, 3);
+
+        if (related.length === 0) {
+          document.querySelector(".related-section").style.display = "none";
+          return;
+        }
+
+        document.getElementById("relatedGrid").innerHTML = related.map(r => {
+          const rc = categoryById(r.category);
+          const thumb = r.image
+            ? `<img src="${r.image}" alt="" />`
+            : `<div class="ph-img ph-${r.category}" style="height:100%">${rc.name}</div>`;
+          return `
+            <a class="related-card" href="haber.html?id=${encodeURIComponent(r.id)}">
+              <div class="thumb">${thumb}</div>
+              <div class="rbody">
+                <span class="rcat" style="color:${rc.color}">${rc.name}</span>
+                <h4>${r.title}</h4>
+                <div class="rt">${timeAgo(r.published)}</div>
+              </div>
+            </a>`;
+        }).join("");
+      });
+
+  }).catch(() => showError());
+
+  // Paylaşım fonksiyonları
+  window.shareTwitter = function() {
+    const url = encodeURIComponent(location.href);
+    const text = encodeURIComponent(document.getElementById("artTitle").textContent);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
+  };
+  window.shareWhatsApp = function() {
+    const text = encodeURIComponent(document.getElementById("artTitle").textContent + " " + location.href);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
+  window.copyLink = function() {
+    navigator.clipboard.writeText(location.href).then(() => {
+      const btn = event.target;
+      const orig = btn.textContent;
+      btn.textContent = "✓ Kopyalandı";
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+  };
+})();
 </script>
 </body>
 </html>
