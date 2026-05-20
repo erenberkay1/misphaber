@@ -650,20 +650,128 @@
 
 <input type="hidden" id="searchInput" />
 
-<script src="data.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-  // ===== HEADER tarih (kaldırıldı) =====
+(function () {
+  const _cfg = {
+    apiKey: "AIzaSyCdB1E_QPW9hUkerftOks1XfUeY6lXGlZ0",
+    authDomain: "misphaber.firebaseapp.com",
+    projectId: "misphaber",
+    storageBucket: "misphaber.firebasestorage.app",
+    messagingSenderId: "165920201061",
+    appId: "1:165920201061:web:59e313f53931d76458a98c"
+  };
+  firebase.initializeApp(_cfg);
+  const _db  = firebase.firestore();
+  const _auth = firebase.auth();
 
-  // ===== NAV kategorileri =====
+  const CATEGORIES = [
+    { id: "gundem",  name: "Gündem",  color: "#c8102e" },
+    { id: "turkiye", name: "Türkiye", color: "#1f4b8a" },
+    { id: "kktc",    name: "KKTC",    color: "#0b7a3b" },
+    { id: "dunya",   name: "Dünya",   color: "#2a6fdb" },
+    { id: "ekonomi", name: "Ekonomi", color: "#a33089" },
+  ];
+
+  const SEED = [
+    { title: "Merkez Bankası faiz kararını açıkladı: Piyasalar nasıl tepki verdi?", summary: "Para Politikası Kurulu yıl sonu beklentilerini de etkileyecek kararını duyurdu.", content: "Merkez Bankası bugün yaptığı toplantıda politika faizini değerlendirdi. Enflasyonla mücadelede kararlılığın süreceği vurgulandı.\n\nPiyasa aktörleri kararın ardından ilk tepkilerini verdi. Borsa endeksi gün içinde dalgalı seyretti.", category: "ekonomi", author: "Ekonomi Servisi", image: "", featured: true },
+    { title: "Yeni eğitim yılında müfredat değişiklikleri: Veliler ne bilmeli?", summary: "Milli Eğitim Bakanlığı'nın yeni müfredatıyla birlikte ders saatleri ve içerik düzenlemeleri başlıyor.", content: "Eğitim öğretim yılı yaklaşırken müfredattaki değişiklikler tartışılıyor. Dijital okuryazarlık derslerinin ağırlığı artıyor.\n\nVelilere yönelik rehber, okul-aile işbirliğini güçlendirmeyi amaçlıyor.", category: "turkiye", author: "Türkiye Servisi", image: "", featured: true },
+    { title: "KKTC'de turizm sezonu rekor doluluk oranıyla açıldı", summary: "Otelcilik sektörü temsilcileri sezonun ilk ayında doluluk oranlarının yüzde 90'ı geçtiğini açıkladı.", content: "KKTC'de turizm sektörü beklentilerin üzerinde bir performansla sezona başladı. Yabancı ziyaretçi sayısında belirgin artış var.\n\nUlusal havayolu şirketleri de sefer sayılarını artırdı.", category: "kktc", author: "KKTC Servisi", image: "", featured: true },
+    { title: "Yapay zekâ destekli yeni telefon modeli tanıtıldı", summary: "Cihaz, görüntü işleme ve dil modeli özellikleriyle dikkat çekiyor. Türkiye satış tarihi de belli oldu.", content: "Teknoloji devinin yeni amiral gemisi cihazı görsel arama ve gerçek zamanlı çeviri özellikleriyle gündeme oturdu.\n\nFiyatlama ülkeye göre değişiklik gösterecek. Türkiye'deki ön satışlar önümüzdeki ay başlıyor.", category: "ekonomi", author: "Teknoloji Masası", image: "", featured: false },
+    { title: "Akdeniz'de yaz turizmi rekoru: Doluluk oranları yüzde 95'i geçti", summary: "Tatil bölgelerinde otel doluluk oranları beklentilerin üzerine çıktı.", content: "Yaz sezonu boyunca süren yoğunluk sektör temsilcilerinin yüzünü güldürdü. Yabancı turist sayısındaki artışın yanı sıra iç turizmde de hareketlilik var.", category: "turkiye", author: "Şehir Servisi", image: "", featured: false },
+    { title: "Sağlık uzmanlarından mevsim geçişi uyarısı", summary: "Doktorlar, mevsim geçişlerinde alınması gereken önlemleri ve beslenme önerilerini paylaştı.", content: "Mevsim geçişleriyle birlikte üst solunum yolu enfeksiyonlarında artış gözleniyor. Uzmanlar bol sıvı tüketimi ve düzenli uyku öneriyor.", category: "gundem", author: "Sağlık Masası", image: "", featured: false },
+    { title: "Avrupa Parlamentosu kritik oylama için toplanıyor", summary: "Gündemdeki yasa tasarısı tartışmalara neden olurken üye ülkelerin tutumu merak ediliyor.", content: "Avrupa Parlamentosu önümüzdeki hafta kritik bir oylama gerçekleştirecek. Tasarı üye ülkeler arasında farklı görüşlere yol açıyor.", category: "dunya", author: "Dünya Servisi", image: "", featured: false },
+  ];
+
+  // --- Firestore helpers ---
+  async function all() {
+    const snap = await _db.collection("news").orderBy("published","desc").get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  async function byId(id) {
+    const doc = await _db.collection("news").doc(id).get();
+    return doc.exists ? { id: doc.id, ...doc.data() } : null;
+  }
+  async function byCategory(catId) {
+    const snap = await _db.collection("news")
+      .where("category","==",catId).orderBy("published","desc").get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  async function add(news) {
+    const item = { published: Date.now(), image: "", featured: false, ...news };
+    const ref = await _db.collection("news").add(item);
+    return { id: ref.id, ...item };
+  }
+  async function update(id, patch) {
+    await _db.collection("news").doc(id).update(patch);
+  }
+  async function remove(id) {
+    await _db.collection("news").doc(id).delete();
+  }
+  async function resetSeed() {
+    const snap = await _db.collection("news").get();
+    const b = _db.batch();
+    snap.docs.forEach(d => b.delete(d.ref));
+    await b.commit();
+    const b2 = _db.batch();
+    const now = Date.now();
+    SEED.forEach((s,i) => {
+      const r = _db.collection("news").doc();
+      b2.set(r, { ...s, published: now - i * 1000 * 60 * 60 * 3 });
+    });
+    await b2.commit();
+  }
+  function subscribe(cb) {
+    return _db.collection("news").orderBy("published","desc").onSnapshot(snap => {
+      cb(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+  }
+
+  // --- Auth helpers ---
+  async function login(email, pass) {
+    await _auth.signInWithEmailAndPassword(email, pass);
+  }
+  async function logout() { await _auth.signOut(); }
+  function onAuthChange(cb) { return _auth.onAuthStateChanged(cb); }
+
+  // --- Sync helpers ---
+  function categoryById(id) {
+    return CATEGORIES.find(c => c.id === id) || { name: id, color: "#444" };
+  }
+  function timeAgo(ts) {
+    const diff = Date.now() - ts;
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return "az önce";
+    if (m < 60) return m + " dakika önce";
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + " saat önce";
+    const d = Math.floor(h / 24);
+    if (d < 7) return d + " gün önce";
+    return new Date(ts).toLocaleDateString("tr-TR");
+  }
+  function formatDate(ts) {
+    return new Date(ts).toLocaleString("tr-TR", {
+      day:"2-digit", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit"
+    });
+  }
+
+  window.MISP = {
+    CATEGORIES, all, byId, byCategory, add, update, remove,
+    resetSeed, subscribe, login, logout, onAuthChange,
+    categoryById, timeAgo, formatDate,
+  };
+})();
+</script>
+<script>
+  // NAV kategorileri
   const navWrap = document.getElementById("navWrap");
   MISP.CATEGORIES.forEach(c => {
     const a = document.createElement("a");
-    a.textContent = c.name;
-    a.href = "#cat-" + c.id;
+    a.textContent = c.name; a.href = "#cat-"+c.id;
     navWrap.appendChild(a);
   });
-
-  // Footer kategorileri
   const footCats = document.getElementById("footCats");
   MISP.CATEGORIES.forEach(c => {
     const li = document.createElement("li");
@@ -671,134 +779,78 @@
     footCats.appendChild(li);
   });
 
-  // ===== Helpers =====
-  function placeholder(n) {
-    return `<div class="ph cat-${n.category}">${MISP.categoryById(n.category).name} · görsel</div>`;
-  }
-  function thumbHTML(n) {
-    if (n.image) return `<img src="${n.image}" alt="" style="width:100%;height:100%;object-fit:cover" />`;
-    return placeholder(n);
-  }
+  function placeholder(n) { return `<div class="ph cat-${n.category}">${MISP.categoryById(n.category).name} · görsel</div>`; }
+  function thumbHTML(n) { return n.image ? `<img src="${n.image}" alt="" style="width:100%;height:100%;object-fit:cover" />` : placeholder(n); }
   function link(n) { return `haber.html?id=${encodeURIComponent(n.id)}`; }
-  function catTagHTML(n) {
-    const c = MISP.categoryById(n.category);
-    return `<span class="cat-tag" style="color:${c.color}">${c.name}</span>`;
-  }
+  function catTagHTML(n) { const c=MISP.categoryById(n.category); return `<span class="cat-tag" style="color:${c.color}">${c.name}</span>`; }
 
-  // ===== Breaking ticker (kaldırıldı) =====
-  function renderBreaking() { /* no-op */ }
-
-  // ===== HERO =====
-  function renderHero() {
-    const list = MISP.all();
-    if (list.length === 0) return;
-    const [lead, ...rest] = list;
-    const side = rest.slice(0, 4);
+  async function renderHero(list) {
+    if (list.length===0) return;
+    const [lead,...rest] = list;
+    const side = rest.slice(0,4);
+    const c = MISP.categoryById(lead.category);
     document.getElementById("leadSlot").innerHTML = `
       <a href="${link(lead)}" style="display:block;width:100%;height:100%;position:relative;color:#fff">
         <div style="width:100%;height:100%">${thumbHTML(lead)}</div>
         <div class="grad"></div>
         <div class="meta">
-          <span class="cat-tag" style="background:${MISP.categoryById(lead.category).color}">${MISP.categoryById(lead.category).name}</span>
+          <span class="cat-tag" style="background:${c.color}">${c.name}</span>
           <h1>${lead.title}</h1>
-          <p>${lead.summary || ""}</p>
-          <div class="time">${MISP.timeAgo(lead.published).toUpperCase()} · ${lead.author || "MISP Haber"}</div>
+          <p>${lead.summary||""}</p>
+          <div class="time">${MISP.timeAgo(lead.published).toUpperCase()} · ${lead.author||"MISP Haber"}</div>
         </div>
       </a>`;
-    document.getElementById("sideList").innerHTML = side.map(n => `
+    document.getElementById("sideList").innerHTML = side.map(n=>`
       <a class="side-item" href="${link(n)}">
         <div class="thumb">${thumbHTML(n)}</div>
-        <div>
-          ${catTagHTML(n)}
-          <h3>${n.title}</h3>
-          <div class="time">${MISP.timeAgo(n.published)}</div>
-        </div>
-      </a>
-    `).join("");
+        <div>${catTagHTML(n)}<h3>${n.title}</h3><div class="time">${MISP.timeAgo(n.published)}</div></div>
+      </a>`).join("");
   }
 
-  // ===== LATEST =====
-  function renderLatest() {
-    const list = MISP.all().slice(5, 11);
-    document.getElementById("latestList").innerHTML = list.map(n => `
+  async function renderLatest(list) {
+    document.getElementById("latestList").innerHTML = list.slice(5,11).map(n=>`
       <a class="card" href="${link(n)}">
         <div class="thumb">${thumbHTML(n)}</div>
         ${catTagHTML(n)}
         <h3>${n.title}</h3>
-        <p class="excerpt">${(n.summary || "").slice(0, 110)}${(n.summary || "").length > 110 ? "…" : ""}</p>
-        <div class="meta"><span>${MISP.timeAgo(n.published)}</span><span>·</span><b>${n.author || "MISP Haber"}</b></div>
-      </a>
-    `).join("") || `<div style="color:var(--muted);padding:40px">Henüz haber yok.</div>`;
+        <p class="excerpt">${(n.summary||"").slice(0,110)}${(n.summary||"").length>110?"…":""}</p>
+        <div class="meta"><span>${MISP.timeAgo(n.published)}</span><span>·</span><b>${n.author||"MISP Haber"}</b></div>
+      </a>`).join("") || `<div style="color:var(--muted);padding:40px">Henüz haber yok.</div>`;
 
-    document.getElementById("mostRead").innerHTML = MISP.all().slice(0, 5).map((n, i) => `
-      <a href="${link(n)}" style="display:contents">
-        <li>
-          <div class="num">${i+1}</div>
-          <div>
-            <h4>${n.title}</h4>
-            <span class="t">${MISP.categoryById(n.category).name.toUpperCase()} · ${MISP.timeAgo(n.published)}</span>
-          </div>
-        </li>
-      </a>
-    `).join("");
+    document.getElementById("mostRead").innerHTML = list.slice(0,5).map((n,i)=>`
+      <a href="${link(n)}" style="display:contents"><li>
+        <div class="num">${i+1}</div>
+        <div><h4>${n.title}</h4><span class="t">${MISP.categoryById(n.category).name.toUpperCase()} · ${MISP.timeAgo(n.published)}</span></div>
+      </li></a>`).join("");
   }
 
-  // ===== CATEGORY STRIPS =====
-  function renderStrip(catId, mountId) {
-    const items = MISP.byCategory(catId);
-    const mount = document.getElementById(mountId);
-    if (!mount) return;
-    if (items.length === 0) {
-      mount.innerHTML = `<div style="color:var(--muted);grid-column:1/-1">Bu kategoride henüz haber yok.</div>`;
-      return;
-    }
-    const [big, ...rest] = items;
-    const list = rest.slice(0, 5);
+  async function renderStrip(catId, mountId, list) {
+    const mount = document.getElementById(mountId); if (!mount) return;
+    const items = list.filter(n=>n.category===catId);
+    if (items.length===0) { mount.innerHTML=`<div style="color:var(--muted);grid-column:1/-1">Bu kategoride henüz haber yok.</div>`; return; }
+    const [big,...rest] = items;
     mount.innerHTML = `
       <a class="strip-big" href="${link(big)}">
         <div class="thumb">${thumbHTML(big)}</div>
-        ${catTagHTML(big)}
-        <h3>${big.title}</h3>
-        <p>${(big.summary || "").slice(0, 140)}</p>
+        ${catTagHTML(big)}<h3>${big.title}</h3><p>${(big.summary||"").slice(0,140)}</p>
       </a>
       <div class="strip-list">
-        ${list.slice(0,3).map(n => `
-          <a class="item" href="${link(n)}">
-            <div class="thumb">${thumbHTML(n)}</div>
-            <div>
-              <h4>${n.title}</h4>
-              <span class="t">${MISP.timeAgo(n.published)}</span>
-            </div>
-          </a>
-        `).join("")}
+        ${rest.slice(0,3).map(n=>`<a class="item" href="${link(n)}"><div class="thumb">${thumbHTML(n)}</div><div><h4>${n.title}</h4><span class="t">${MISP.timeAgo(n.published)}</span></div></a>`).join("")}
       </div>
       <div class="strip-list">
-        ${list.slice(3,6).map(n => `
-          <a class="item" href="${link(n)}">
-            <div class="thumb">${thumbHTML(n)}</div>
-            <div>
-              <h4>${n.title}</h4>
-              <span class="t">${MISP.timeAgo(n.published)}</span>
-            </div>
-          </a>
-        `).join("") || '<div style="color:var(--muted);font-size:13px">Bu kategoride başka haber bulunmuyor.</div>'}
-      </div>
-    `;
+        ${rest.slice(3,6).map(n=>`<a class="item" href="${link(n)}"><div class="thumb">${thumbHTML(n)}</div><div><h4>${n.title}</h4><span class="t">${MISP.timeAgo(n.published)}</span></div></a>`).join("") || '<div style="color:var(--muted);font-size:13px">Daha fazla haber yok.</div>'}
+      </div>`;
   }
 
-  function renderAll() {
-    renderBreaking();
-    renderHero();
-    renderLatest();
-    renderStrip("turkiye", "turkiyeStrip");
-    renderStrip("kktc", "kktcStrip");
-    renderStrip("dunya", "dunyaStrip");
-    renderStrip("ekonomi", "ekonomiStrip");
-  }
-
-  renderAll();
-  window.addEventListener("misp:news-updated", renderAll);
+  // Firestore'u gerçek zamanlı dinle — haber eklenince sayfa otomatik güncellenir
+  MISP.subscribe(function(list) {
+    renderHero(list);
+    renderLatest(list);
+    renderStrip("turkiye", "turkiyeStrip", list);
+    renderStrip("kktc",    "kktcStrip",    list);
+    renderStrip("dunya",   "dunyaStrip",   list);
+    renderStrip("ekonomi", "ekonomiStrip", list);
+  });
 </script>
-
 </body>
 </html>
