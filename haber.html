@@ -264,10 +264,17 @@
   const params = new URLSearchParams(location.search);
   const newsId = params.get("id");
 
-  function showError() {
+  function showError(msg) {
     document.getElementById("stateLoading").style.display = "none";
     document.getElementById("stateError").style.display   = "flex";
     document.getElementById("stateArticle").style.display = "none";
+    if (msg) {
+      const p = document.createElement("p");
+      p.style.cssText = "font-size:12px;color:#c8102e;font-family:monospace;margin-top:12px;max-width:500px;word-break:break-all;";
+      p.textContent = "Hata: " + msg;
+      document.getElementById("stateError").appendChild(p);
+    }
+    console.error("haber.html hata:", msg);
   }
 
   function showArticle() {
@@ -276,11 +283,13 @@
     document.getElementById("stateArticle").style.display  = "block";
   }
 
-  if (!newsId) { showError(); return; }
+  console.log("Aranan haber ID:", newsId);
+  if (!newsId) { showError("URL'de ?id= parametresi yok"); return; }
 
   // Firestore'dan haberi çek
   _db.collection("news").doc(newsId).get().then(doc => {
-    if (!doc.exists) { showError(); return; }
+    console.log("Firestore doc.exists:", doc.exists, "| ID:", doc.id);
+    if (!doc.exists) { showError("Bu ID Firestore'da yok: " + newsId); return; }
 
     const n = { id: doc.id, ...doc.data() };
     const cat = categoryById(n.category);
@@ -353,7 +362,7 @@
         }).join("");
       });
 
-  }).catch(() => showError());
+  }).catch(err => showError(err.message || String(err)));
 
   // Paylaşım fonksiyonları
   window.shareTwitter = function() {
